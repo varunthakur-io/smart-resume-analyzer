@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 
 from utils.extractor import extract_text_from_pdf
+from utils.matcher import calculate_match_score
 
 app = Flask(__name__)
 CORS(app)
@@ -32,13 +33,17 @@ def analyze_resume():
     # Extract resume text
     resume_text = extract_text_from_pdf(file_path)
 
-    # Dummy response for now
+    # Calculate match score
+    match_result = calculate_match_score(resume_text, job_description)
+
+    # Clean up the uploaded file
+    os.remove(file_path)
+
+    # Return the match result
     return jsonify({
-        'match_score': 78,
-        'missing_skills': ['React', 'TypeScript'],
-        'suggestions': 'Add more frontend projects to your resume.',
-        'resume_text': resume_text[:300]  # Optional for testing/debugging
+        **match_result,
     })
+
 
 if __name__ == '__main__':
     app.run(debug=True)
