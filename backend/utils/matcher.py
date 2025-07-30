@@ -1,10 +1,8 @@
-import os
 import re
-from dotenv import load_dotenv
-from sklearn.metrics.pairwise import cosine_similarity
-from .openai_embedder import get_embedding
+from sentence_transformers import SentenceTransformer, util
 
-load_dotenv()
+# Load model only once
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
 def clean_text(text):
     text = re.sub(r'[^a-zA-Z ]', '', text)
@@ -12,17 +10,17 @@ def clean_text(text):
 
 def calculate_match_score(resume_text, job_description):
     try:
-        # ✅ Get OpenAI embeddings
-        resume_embedding = get_embedding(resume_text)
-        jd_embedding = get_embedding(job_description)
+        # ✅ Generate embeddings using local MiniLM model
+        resume_embedding = model.encode(resume_text, convert_to_tensor=True)
+        jd_embedding = model.encode(job_description, convert_to_tensor=True)
 
-        # ✅ Cosine similarity between the vectors
-        score = cosine_similarity([resume_embedding], [jd_embedding])[0][0]
+        # ✅ Compute cosine similarity
+        score = util.cos_sim(resume_embedding, jd_embedding).item()
         match_percentage = round(score * 100, 2)
 
         return {
             "match_score": match_percentage,
-            "suggestions": "This score is based on semantic similarity using OpenAI embeddings.",
+            "suggestions": "Score calculated using local semantic embeddings with MiniLM (sentence-transformers)."
         }
 
     except Exception as e:
