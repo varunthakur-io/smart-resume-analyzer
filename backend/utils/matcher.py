@@ -1,6 +1,9 @@
 import re
+import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
+nlp = spacy.load("en_core_web_sm")
 
 def clean_text(text):
     text = re.sub(r'[^a-zA-Z ]', '', text)
@@ -14,10 +17,21 @@ def load_skills():
     except:
         return []
 
-def find_missing_skills(resume_text, skills_list):
-    resume_words = set(clean_text(resume_text).split())
-    missing = [skill for skill in skills_list if skill.lower() not in resume_words]
-    return missing
+def extract_skills_with_nlp(text, known_skills):
+    doc = nlp(text)
+    found_skills = set()
+
+    for chunk in doc.noun_chunks:
+        chunk_text = chunk.text.strip().lower()
+        if chunk_text in known_skills:
+            found_skills.add(chunk_text)
+
+    for ent in doc.ents:
+        ent_text = ent.text.strip().lower()
+        if ent_text in known_skills:
+            found_skills.add(ent_text)
+
+    return list(found_skills)
 
 def calculate_match_score(resume_text, job_description):
     resume_clean = clean_text(resume_text)
@@ -29,12 +43,14 @@ def calculate_match_score(resume_text, job_description):
     score = cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
     match_percentage = round(score * 100, 2)
 
-    # Load skills & find what's missing
-    all_skills = load_skills()
-    missing_skills = find_missing_skills(resume_text, all_skills)
+    # Smart skill extraction
+    known_skills = load_skills()
+    extracted_skills = extract_skills_with_nlp(resume_text, known_skills)
+    missing_skills = [skill for skill in known_skills if skill not in extracted_skills]
 
     return {
         "match_score": match_percentage,
+        "extracted_skills": extracted_skills,
         "missing_skills": missing_skills,
-        "suggestions": "Try to include more relevant skills in your resume."
+        "suggestions": "Include more relevant skills found in the job description."
     }
