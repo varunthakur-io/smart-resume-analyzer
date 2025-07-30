@@ -87,14 +87,14 @@ const UploadForm = () => {
               Match Score: {result.match_score}%
             </h3>
 
-            <p className="mt-2 text-gray-600">
+            {/* {    <p className="mt-2 text-gray-600">
               <strong>Extracted Skills:</strong>{" "}
               {result.extracted_skills.join(", ") || "None 🎉"}
-            </p>
-            <p className="mt-2 text-gray-600">
+            </p>} */}
+           {/* { <p className="mt-2 text-gray-600">
               <strong>Missing Skills:</strong>{" "}
               {result.missing_skills.join(", ") || "None 🎉"}
-            </p>
+            </p>} */}
             <p className="mt-2 text-gray-600">
               <strong>Suggestions:</strong> {result.suggestions}
             </p>
