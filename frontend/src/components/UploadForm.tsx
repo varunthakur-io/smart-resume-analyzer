@@ -26,7 +26,7 @@ const UploadForm = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/analyze", formData);
+      const res = await axios.post("http://192.168.1.9:5000/analyze", formData);
       setResult(res.data);
     } catch (err) {
       alert("Error analyzing resume. Check console.");
