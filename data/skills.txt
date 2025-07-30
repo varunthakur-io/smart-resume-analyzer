@@ -1,0 +1,21 @@
+Python
+JavaScript
+React
+Node.js
+SQL
+MongoDB
+TypeScript
+HTML
+CSS
+Flask
+Django
+Git
+Machine Learning
+Deep Learning
+NLP
+Data Analysis
+REST API
+TensorFlow
+Pandas
+NumPy
+Docker
