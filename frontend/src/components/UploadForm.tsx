@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Dashboard from "./Dashboard";
 
 const UploadForm = () => {
   const [resume, setResume] = useState<File | null>(null);
@@ -8,6 +9,7 @@ const UploadForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -33,6 +35,7 @@ const UploadForm = () => {
       const res = await axios.post("http://192.168.1.3:5000/analyze", formData);
       setResult(res.data);
       setSuccess("Analysis complete!");
+      setShowDashboard(false); // Reset dashboard view on new analysis
     } catch (err) {
       setError("Error analyzing resume. Please try again.");
       setResult(null);
@@ -128,7 +131,7 @@ const UploadForm = () => {
         </button>
       </form>
 
-      {result && (
+      {result && !showDashboard && (
         <div className="mt-8 p-6 rounded-xl shadow bg-gray-50 animate-fade-in">
           <h3
             className={`text-xl font-bold mb-2 px-3 py-2 rounded-lg inline-block ${getScoreColor(
@@ -152,7 +155,21 @@ const UploadForm = () => {
           <p className="mt-2 text-gray-700">
             <strong>Suggestions:</strong> {result.suggestions}
           </p>
+          <button
+            className="mt-6 w-full py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all duration-200"
+            onClick={() => setShowDashboard(true)}
+          >
+            View Visual Analytics Dashboard
+          </button>
         </div>
+      )}
+
+      {result && showDashboard && (
+        <Dashboard
+          matchScore={result.match_score}
+          extractedSkills={result.extracted_skills || []}
+          missingSkills={result.missing_skills || []}
+        />
       )}
     </div>
   );
