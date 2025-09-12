@@ -2,7 +2,7 @@
     "name": "smart-resume-analyzer",
     "version": "1.0.0",
     "scripts": {
-        "dev:backend": "cd backend && .\\venv\\Scripts\\python.exe -m pip install -r requirements.txt && .\\venv\\Scripts\\python.exe app.py",
+        "dev:backend": "cd backend && .\\venv\\Scripts\\python.exe app.py",
         "dev:frontend": "cd frontend && npm run dev",
         "dev": "concurrently -n BACKEND,FRONTEND -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\""
     },

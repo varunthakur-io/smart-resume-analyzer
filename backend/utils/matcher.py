@@ -7,7 +7,8 @@ from typing import Dict, List
 import spacy
 
 # Load model only once
-model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+
 
 # Load spaCy model once
 @lru_cache(maxsize=1)
@@ -18,6 +19,7 @@ def get_nlp():
         # Attempt to download if missing (no-op if offline)
         return spacy.blank("en")
 
+
 # Thresholds configurable via env vars
 SKILL_IN_RESUME_THRESHOLD = float(os.getenv("SKILL_IN_RESUME_THRESHOLD", "0.55"))
 SKILL_IN_JD_THRESHOLD = float(os.getenv("SKILL_IN_JD_THRESHOLD", "0.60"))
@@ -25,13 +27,14 @@ CANDIDATE_SIM_THRESHOLD = float(os.getenv("CANDIDATE_SIM_THRESHOLD", "0.58"))
 MIN_CANDIDATE_LEN = int(os.getenv("MIN_CANDIDATE_LEN", "3"))
 MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "40"))
 
+
 @lru_cache(maxsize=1)
 def load_skills_list() -> List[str]:
     # skills.txt is located at backend/data/skills.txt relative to this file
-    skills_path = Path(__file__).resolve().parents[1] / 'data' / 'skills.txt'
+    skills_path = Path(__file__).resolve().parents[1] / "data" / "skills.txt"
     skills: List[str] = []
     try:
-        with open(skills_path, encoding='utf-8') as f:
+        with open(skills_path, encoding="utf-8") as f:
             for line in f:
                 skill = line.strip()
                 if skill:
@@ -39,10 +42,19 @@ def load_skills_list() -> List[str]:
     except Exception:
         # Fallback to a minimal set if file missing
         skills = [
-            'Python', 'JavaScript', 'React', 'TypeScript', 'HTML', 'CSS', 'Flask', 'Django',
-            'SQL', 'REST API'
+            "Python",
+            "JavaScript",
+            "React",
+            "TypeScript",
+            "HTML",
+            "CSS",
+            "Flask",
+            "Django",
+            "SQL",
+            "REST API",
         ]
     return skills
+
 
 @lru_cache(maxsize=1)
 def load_skill_embeddings() -> Dict[str, List[float]]:
@@ -51,13 +63,16 @@ def load_skill_embeddings() -> Dict[str, List[float]]:
     # Map skill -> embedding tensor (retain device tensor for cosine sim)
     return {skill: embeddings[i] for i, skill in enumerate(skills)}
 
+
 def normalize(text: str) -> str:
-    return re.sub(r'\s+', ' ', text or '').strip()
+    return re.sub(r"\s+", " ", text or "").strip()
+
 
 def cleanup_phrase(text: str) -> str:
     t = re.sub(r"[\s\-_/]+", " ", text or "").strip()
     t = t.strip(".,;:!()[]{}\"'`~")
     return t
+
 
 def extract_candidates_spacy(text: str) -> List[str]:
     """Extract noun chunks and standalone proper/common noun tokens as candidate skills/terms."""
@@ -95,9 +110,10 @@ def extract_candidates_spacy(text: str) -> List[str]:
     # Trim
     return unique[:MAX_CANDIDATES]
 
+
 def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[str]:
     """Return canonical skills detected in text using substring OR semantic similarity."""
-    text_lower = (text or '').lower()
+    text_lower = (text or "").lower()
     skill_embs = load_skill_embeddings()
     detected: List[str] = []
     for skill, emb in skill_embs.items():
@@ -119,7 +135,10 @@ def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[
             unique.append(s)
     return unique
 
-def presence_by_similarity(phrases: List[str], target_embedding, threshold: float) -> List[str]:
+
+def presence_by_similarity(
+    phrases: List[str], target_embedding, threshold: float
+) -> List[str]:
     """Return phrases considered present in target by embedding similarity."""
     if not phrases:
         return []
@@ -130,6 +149,7 @@ def presence_by_similarity(phrases: List[str], target_embedding, threshold: floa
         return present
     except Exception:
         return []
+
 
 def calculate_match_score(resume_text, job_description):
     try:
@@ -143,17 +163,35 @@ def calculate_match_score(resume_text, job_description):
         match_percentage = round(max(0.0, min(1.0, score)) * 100, 2)
 
         # Canonical skills (semantic)
-        resume_skills_canonical = detect_skills_semantic(resume_text, resume_embedding, SKILL_IN_RESUME_THRESHOLD)
-        jd_skills_canonical = detect_skills_semantic(job_description, jd_embedding, SKILL_IN_JD_THRESHOLD)
+        resume_skills_canonical = detect_skills_semantic(
+            resume_text, resume_embedding, SKILL_IN_RESUME_THRESHOLD
+        )
+        jd_skills_canonical = detect_skills_semantic(
+            job_description, jd_embedding, SKILL_IN_JD_THRESHOLD
+        )
 
         # Dynamic candidates from JD via spaCy
         jd_candidates = extract_candidates_spacy(job_description)
         # Consider only meaningful candidates (filter overly generic)
-        generic = {"experience", "skills", "responsibilities", "team", "project", "work", "role", "company", "job", "requirement", "requirements"}
+        generic = {
+            "experience",
+            "skills",
+            "responsibilities",
+            "team",
+            "project",
+            "work",
+            "role",
+            "company",
+            "job",
+            "requirement",
+            "requirements",
+        }
         jd_candidates = [c for c in jd_candidates if c.lower() not in generic]
 
         # Determine which JD candidates appear in the resume semantically
-        present_dynamic = presence_by_similarity(jd_candidates, resume_embedding, CANDIDATE_SIM_THRESHOLD)
+        present_dynamic = presence_by_similarity(
+            jd_candidates, resume_embedding, CANDIDATE_SIM_THRESHOLD
+        )
         missing_dynamic = [c for c in jd_candidates if c not in present_dynamic]
 
         # Extract resume dynamic candidates as those JD candidates that are present
@@ -173,7 +211,11 @@ def calculate_match_score(resume_text, job_description):
 
         extracted_skills = merge_unique(resume_skills_canonical, resume_skills_dynamic)
         # Missing: prioritize JD canonical + JD dynamic not present in extracted
-        missing_skills = [s for s in merge_unique(jd_skills_canonical, jd_candidates) if s not in set(extracted_skills)]
+        missing_skills = [
+            s
+            for s in merge_unique(jd_skills_canonical, jd_candidates)
+            if s not in set(extracted_skills)
+        ]
 
         # Suggestions (rule-based)
         suggestions_parts = []
@@ -194,14 +236,16 @@ def calculate_match_score(resume_text, job_description):
                 "Strong match. Ensure your most relevant accomplishments are prominent in the top third of your resume."
             )
         if (jd_skills_canonical or jd_candidates) and not missing_skills:
-            suggestions_parts.append("All key areas from the job description are covered. Great!")
+            suggestions_parts.append(
+                "All key areas from the job description are covered. Great!"
+            )
         suggestions = " ".join(suggestions_parts)
 
         return {
             "match_score": match_percentage,
             "extracted_skills": extracted_skills,
             "missing_skills": missing_skills,
-            "suggestions": suggestions
+            "suggestions": suggestions,
         }
 
     except Exception as e:
@@ -209,5 +253,5 @@ def calculate_match_score(resume_text, job_description):
             "match_score": 0,
             "extracted_skills": [],
             "missing_skills": [],
-            "suggestions": f"Error generating score: {str(e)}"
+            "suggestions": f"Error generating score: {str(e)}",
         }
