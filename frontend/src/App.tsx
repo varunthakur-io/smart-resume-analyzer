@@ -25,9 +25,9 @@ function App() {
           </span>
           <button
             className="ml-4 px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/upload")}
           >
-            Go to Dashboard
+            New Analysis
           </button>
         </div>
       </header>
