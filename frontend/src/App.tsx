@@ -12,9 +12,12 @@ function App() {
       <header className="w-full bg-white shadow-md py-4 px-8 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img src={cvLogo} alt="Logo" className="h-8 w-8" />
-          <span className="text-2xl font-bold text-blue-700 tracking-tight">
+          <button
+            className="text-2xl font-bold text-blue-700 tracking-tight"
+            onClick={() => navigate("/")}
+          >
             Smart Resume Analyzer
-          </span>
+          </button>
         </div>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-400 font-mono">
