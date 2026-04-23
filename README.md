@@ -1,3 +1,12 @@
+---
+title: Smart Resume Analyzer
+emoji: 📄
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Smart Resume Analyzer
 
 AI-powered resume-to-job-description analyzer with a modern UX and professional backend.
