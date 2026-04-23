@@ -39,7 +39,8 @@ const AnalysisResultPage: React.FC = () => {
     try {
       setDeleting(true);
       setDeleteMsg(null);
-      const res = await fetch(`http://localhost:5000/resumes/${analysis.id}`, { method: "DELETE" });
+      const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_BASE}/resumes/${analysis.id}`, { method: "DELETE" });
       if (!res.ok) {
         throw new Error("Failed to delete resume file");
       }
