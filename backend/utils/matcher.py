@@ -155,12 +155,19 @@ def calculate_match_score(resume_text, job_description):
     try:
         resume_text = normalize(resume_text)
         job_description = normalize(job_description)
+        
+        print(f"DEBUG: Resume text length: {len(resume_text)}")
+        print(f"DEBUG: JD text length: {len(job_description)}")
 
+        if not resume_text:
+            print("WARNING: Resume text is empty!")
+        
         # Embedding-based similarity (document-level)
         resume_embedding = model.encode(resume_text, convert_to_tensor=True)
         jd_embedding = model.encode(job_description, convert_to_tensor=True)
         score = util.cos_sim(resume_embedding, jd_embedding).item()
         match_percentage = round(max(0.0, min(1.0, score)) * 100, 2)
+        print(f"DEBUG: Match Score calculated: {match_percentage}")
 
         # Canonical skills (semantic)
         resume_skills_canonical = detect_skills_semantic(
@@ -169,9 +176,12 @@ def calculate_match_score(resume_text, job_description):
         jd_skills_canonical = detect_skills_semantic(
             job_description, jd_embedding, SKILL_IN_JD_THRESHOLD
         )
+        print(f"DEBUG: Canonical skills found in Resume: {len(resume_skills_canonical)}")
+        print(f"DEBUG: Canonical skills found in JD: {len(jd_skills_canonical)}")
 
         # Dynamic candidates from JD via spaCy
         jd_candidates = extract_candidates_spacy(job_description)
+        print(f"DEBUG: spaCy JD candidates extracted: {len(jd_candidates)}")
         # Consider only meaningful candidates (filter overly generic)
         generic = {
             "experience",
