@@ -17,11 +17,14 @@ const AnalysisResultPage: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteMsg, setDeleteMsg] = useState<string | null>(null);
   const [resumeDeleted, setResumeDeleted] = useState(false);
+
+  // Safely extract analysis data from router state
   const analysis = useMemo(() => {
     const state = location.state as any;
     return state?.analysis as Analysis | undefined;
   }, [location.state]);
 
+  // Utility to download the analysis as a portable JSON file
   const downloadJson = () => {
     if (!analysis) return;
     const blob = new Blob([JSON.stringify(analysis, null, 2)], { type: "application/json" });
@@ -33,6 +36,7 @@ const AnalysisResultPage: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Handles the "Trust" feature: removes the original PDF from the server
   const handleDeleteResume = async () => {
     if (!analysis) return;
     if (!window.confirm("Delete the uploaded resume file from the server? This cannot be undone.")) return;
@@ -53,6 +57,7 @@ const AnalysisResultPage: React.FC = () => {
     }
   };
 
+  // State-guarded navigation back to upload if data is missing
   if (!analysis) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
@@ -71,6 +76,7 @@ const AnalysisResultPage: React.FC = () => {
     );
   }
 
+  // Memoized skill lists to ensure stable rendering
   const matched = useMemo(() => {
     if (!analysis) return [];
     return Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
@@ -80,6 +86,8 @@ const AnalysisResultPage: React.FC = () => {
     if (!analysis) return [];
     return Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
   }, [analysis]);
+
+  // Check if delete action is available based on file status
   const canShowDelete = !!analysis.resume_file && !resumeDeleted;
 
   return (

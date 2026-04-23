@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const UploadForm = () => {
+  // State for file management and JD input
   const [resume, setResume] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState<any>(null);
@@ -20,10 +21,12 @@ const UploadForm = () => {
 
   const MAX_FILE_MB = 10;
 
+  // Derived state for submission validation
   const jobDescriptionChars = jobDescription.length;
   const jobDescriptionTooShort = jobDescriptionChars < 40;
   const canSubmit = !!resume && !jobDescriptionTooShort && !loading;
 
+  // Handle manual file selection via input
   const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -43,6 +46,7 @@ const UploadForm = () => {
     }
   };
 
+  // Drag-and-drop event handlers for the drop zone
   const onDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -85,12 +89,14 @@ const UploadForm = () => {
     }
   }, []);
 
+  // Dynamic label for the file upload area
   const fileLabel = useMemo(() => {
     if (!resume) return "Upload Resume (PDF)";
     const sizeMb = (resume.size / (1024 * 1024)).toFixed(2);
     return `${resume.name} • ${sizeMb} MB`;
   }, [resume]);
 
+  // Main form submission handler: uploads file and JD to backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -114,20 +120,31 @@ const UploadForm = () => {
     setLoading(true);
 
     try {
+      // POST request to backend analysis endpoint
       const res = await axios.post(`${API_BASE}/analyze`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      console.log("API Response:", res.data);
+
+      // Structure data for UI consumption and navigation
       const enriched = {
-        ...res.data,
-        resume_name: resume?.name || "Uploaded Resume",
-        id: (res.data && res.data.id) || String(Date.now()),
+        id: res.data.id || String(Date.now()),
+        resume_name: resume?.name || res.data.resume_name || "Uploaded Resume",
+        match_score: res.data.match_score ?? 0,
+        extracted_skills: res.data.extracted_skills || [],
+        missing_skills: res.data.missing_skills || [],
+        suggestions: res.data.suggestions || "",
+        resume_file: res.data.resume_file || null,
       };
+
+      console.log("Enriched Data for Navigation:", enriched);
 
       setResult(enriched);
       setSuccess("Analysis complete!");
       setShowDashboard(false);
 
+      // Redirect to detailed analysis page with data in route state
       navigate("/analysis", { state: { analysis: enriched } });
     } catch (err) {
       console.error(err);
@@ -138,6 +155,7 @@ const UploadForm = () => {
     }
   };
 
+  // UI helper for dynamic score color-coding
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600 bg-green-100";
     if (score >= 60) return "text-yellow-700 bg-yellow-100";
