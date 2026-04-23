@@ -71,8 +71,15 @@ const AnalysisResultPage: React.FC = () => {
     );
   }
 
-  const matched = Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
-  const missing = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
+  const matched = useMemo(() => {
+    if (!analysis) return [];
+    return Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
+  }, [analysis]);
+
+  const missing = useMemo(() => {
+    if (!analysis) return [];
+    return Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
+  }, [analysis]);
   const canShowDelete = !!analysis.resume_file && !resumeDeleted;
 
   return (
