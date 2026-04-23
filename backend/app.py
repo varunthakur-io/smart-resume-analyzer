@@ -20,16 +20,22 @@ service = AnalysisService()
 
 @app.get("/")
 def root():
+    """Returns the API status and service name."""
     return jsonify({"status": "ok", "service": "Smart Resume Analyzer API"})
 
 
 @app.get("/healthz")
 def healthz():
+    """Health check endpoint for monitoring and container orchestration."""
     return jsonify({"ok": True})
 
 
 @app.post("/analyze")
 def analyze_resume():
+    """
+    Main endpoint for resume analysis.
+    Expects a multipart form with 'resume' (PDF file) and 'job_description' (string).
+    """
     try:
         if "resume" not in request.files:
             return jsonify({"error": "No resume file provided"}), 400
@@ -46,6 +52,7 @@ def analyze_resume():
 
 @app.get("/analyses")
 def list_analyses():
+    """Retrieves a list of all stored analysis JSON records."""
     try:
         return jsonify(service.list())
     except Exception:
@@ -54,6 +61,7 @@ def list_analyses():
 
 @app.delete("/analyses/<analysis_id>")
 def delete_analysis(analysis_id):
+    """Deletes a complete analysis record and its associated resume file."""
     try:
         ok = service.delete(analysis_id)
         if not ok:
@@ -65,6 +73,10 @@ def delete_analysis(analysis_id):
 
 @app.delete("/resumes/<analysis_id>")
 def delete_resume_only(analysis_id):
+    """
+    Deletes only the uploaded PDF file while keeping the analysis data.
+    Provides user privacy while maintaining historical insights.
+    """
     try:
         ok = service.delete_resume_only(analysis_id)
         if not ok:

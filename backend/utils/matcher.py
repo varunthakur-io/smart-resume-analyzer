@@ -10,6 +10,7 @@ import spacy
 _model: Optional[SentenceTransformer] = None
 
 def get_model():
+    """Lazily loads the SentenceTransformer model to save memory on startup."""
     global _model
     if _model is None:
         print("DEBUG: Loading SentenceTransformer model (all-MiniLM-L6-v2)...")
@@ -21,6 +22,7 @@ def get_model():
 # Load spaCy model once
 @lru_cache(maxsize=1)
 def get_nlp():
+    """Lazily loads the spaCy NLP model for entity and noun chunk extraction."""
     try:
         print("DEBUG: Loading spaCy model...")
         nlp = spacy.load("en_core_web_sm")
@@ -42,6 +44,7 @@ MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "40"))
 
 @lru_cache(maxsize=1)
 def load_skills_list() -> List[str]:
+    """Loads the canonical skills list from a text file or returns a fallback set."""
     # skills.txt is located at backend/data/skills.txt relative to this file
     skills_path = Path(__file__).resolve().parents[1] / "data" / "skills.txt"
     skills: List[str] = []
@@ -70,6 +73,7 @@ def load_skills_list() -> List[str]:
 
 @lru_cache(maxsize=1)
 def load_skill_embeddings() -> Dict[str, List[float]]:
+    """Generates and caches embeddings for the canonical skills list."""
     skills = load_skills_list()
     model = get_model()
     embeddings = model.encode(skills, convert_to_tensor=True)
@@ -78,17 +82,22 @@ def load_skill_embeddings() -> Dict[str, List[float]]:
 
 
 def normalize(text: str) -> str:
+    """Standardizes text by removing redundant whitespace."""
     return re.sub(r"\s+", " ", text or "").strip()
 
 
 def cleanup_phrase(text: str) -> str:
+    """Cleans up extracted noun chunks by removing punctuation and extra whitespace."""
     t = re.sub(r"[\s\-_/]+", " ", text or "").strip()
     t = t.strip(".,;:!()[]{}\"'`~")
     return t
 
 
 def extract_candidates_spacy(text: str) -> List[str]:
-    """Extract noun chunks and standalone proper/common noun tokens as candidate skills/terms."""
+    """
+    Extracts noun chunks and significant nouns from text using spaCy.
+    These are used as 'dynamic' skill candidates from the job description.
+    """
     nlp = get_nlp()
     if not text:
         return []
@@ -125,7 +134,10 @@ def extract_candidates_spacy(text: str) -> List[str]:
 
 
 def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[str]:
-    """Return canonical skills detected in text using substring OR semantic similarity."""
+    """
+    Identifies canonical skills in text using either exact substring matches
+    or high cosine similarity between embeddings.
+    """
     text_lower = (text or "").lower()
     skill_embs = load_skill_embeddings()
     detected: List[str] = []
@@ -152,7 +164,10 @@ def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[
 def presence_by_similarity(
     phrases: List[str], target_embedding, threshold: float
 ) -> List[str]:
-    """Return phrases considered present in target by embedding similarity."""
+    """
+    Determines if a list of phrases is semantically present in a target document 
+    by comparing their embeddings.
+    """
     if not phrases:
         return []
     try:
@@ -166,6 +181,10 @@ def presence_by_similarity(
 
 
 def calculate_match_score(resume_text, job_description):
+    """
+    Core logic: Calculates a percentage match score between a resume and JD,
+    extracts matched/missing skills, and generates tailored suggestions.
+    """
     try:
         resume_text = normalize(resume_text)
         job_description = normalize(job_description)

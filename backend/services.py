@@ -10,6 +10,10 @@ from utils.matcher import calculate_match_score
 
 
 class AnalysisService:
+    """
+    Handles the lifecycle of a resume analysis, including file storage,
+    text extraction, semantic matching, and persistence of results.
+    """
     def __init__(
         self, analyses_dir: Path = ANALYSES_DIR, uploads_dir: Path = UPLOADS_DIR
     ):
@@ -17,6 +21,10 @@ class AnalysisService:
         self.uploads_dir = uploads_dir
 
     def analyze(self, resume_file, job_description: str) -> Dict[str, Any]:
+        """
+        Processes a single resume against a job description.
+        Saves the file, extracts text, calculates scores, and persists the result.
+        """
         if resume_file is None:
             raise ValueError("No resume file provided")
         if not job_description:
@@ -50,6 +58,7 @@ class AnalysisService:
         return response
 
     def list(self) -> List[Dict[str, Any]]:
+        """Lists all existing analysis JSON records from the storage directory."""
         items: List[Dict[str, Any]] = []
         for fname in os.listdir(self.analyses_dir):
             if not fname.endswith(".json"):
@@ -62,6 +71,7 @@ class AnalysisService:
         return items
 
     def delete(self, analysis_id: str) -> bool:
+        """Removes an analysis record and its associated resume PDF from disk."""
         path = self.analyses_dir / f"{analysis_id}.json"
         if not path.exists():
             return False
@@ -79,6 +89,7 @@ class AnalysisService:
             return False
 
     def delete_resume_only(self, analysis_id: str) -> bool:
+        """Deletes the PDF file for an analysis while keeping the JSON result metadata."""
         path = self.analyses_dir / f"{analysis_id}.json"
         if not path.exists():
             return False
@@ -99,6 +110,7 @@ class AnalysisService:
             return False
 
     def _save_doc(self, doc: Dict[str, Any]):
+        """Internal helper to persist analysis results as JSON files."""
         out = self.analyses_dir / f"{doc['id']}.json"
         with open(out, "w", encoding="utf-8") as f:
             json.dump(doc, f)
