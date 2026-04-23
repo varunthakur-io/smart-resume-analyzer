@@ -1,22 +1,4 @@
 services:
-  # Backend: Flask API with gunicorn
-  - type: web
-    name: resume-analyzer-api
-    runtime: python
-    rootDir: backend
-    plan: free # Change to starter if you need more RAM for the model
-    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm && python download_models.py
-    startCommand: gunicorn -b 0.0.0.0:$PORT --preload --timeout 120 --workers 1 app:app
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.10
-      - key: PORT
-        value: 5000
-      - key: CORS_ORIGINS
-        value: "*"
-      - key: DEBUG
-        value: "false"
-
   # Frontend: React (Static Site)
   - type: web
     name: resume-analyzer-ui
@@ -26,7 +8,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: resume-analyzer-api
-          property: host
+        sync: false # This tells Render to keep the value you set in the dashboard
