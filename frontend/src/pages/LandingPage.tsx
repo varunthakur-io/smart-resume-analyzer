@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import cvLogo from "../assets/cv.png";
+
+const BrandLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,11 +32,11 @@ const LandingPage: React.FC = () => {
       <nav className="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
-            <div className="bg-indigo-600 p-2 rounded-xl group-hover:rotate-12 transition-transform">
-              <img src={cvLogo} alt="Logo" className="h-6 w-6 invert brightness-0" />
+            <div className="bg-indigo-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-500/20">
+              <BrandLogo className="h-6 w-6" />
             </div>
             <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
-              ResumeAI.
+              NextRole.
             </span>
           </div>
           
@@ -76,18 +81,18 @@ const LandingPage: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-indigo-400 opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
             </span>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Powered by GPT-4 & NLP</span>
+            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest text-[10px] sm:text-xs">Next-Gen Resume Intelligence</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 animate-fade-in">
-            Optimize your resume <br />
+            Unlock your <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400">
-              for every job app.
+              NextRole.
             </span>
           </h1>
           
           <p className="max-w-2xl mx-auto text-xl text-slate-600 dark:text-slate-400 mb-10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            The AI-powered resume intelligence platform that analyzes job descriptions and reveals exactly why you're not getting called back.
+            The AI-powered platform that analyzes job descriptions and reveals exactly why you're not getting called back. Stop guessing, start landing.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -95,21 +100,21 @@ const LandingPage: React.FC = () => {
               className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-black transition-all shadow-xl shadow-indigo-500/25 hover:-translate-y-1"
               onClick={() => navigate("/upload")}
             >
-              Analyze Resume Free
+              Analyze My Resume
             </button>
             <button className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-lg font-black border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all hover:-translate-y-1">
-              View Demo
+              Watch Demo
             </button>
           </div>
 
           {/* Social Proof Placeholder */}
-          <div className="mt-20 opacity-50 grayscale dark:invert">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] mb-8">Trusted by candidates at</p>
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center">
-              <span className="text-2xl font-black">GOOGLE</span>
-              <span className="text-2xl font-black">AMAZON</span>
-              <span className="text-2xl font-black">META</span>
-              <span className="text-2xl font-black">STRIPE</span>
+          <div className="mt-20 opacity-50 grayscale dark:invert transition-all">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] mb-8">Empowering candidates worldwide</p>
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center font-black text-xl sm:text-2xl">
+              <span>GOOGLE</span>
+              <span>AMAZON</span>
+              <span>META</span>
+              <span>STRIPE</span>
             </div>
           </div>
         </div>
@@ -143,13 +148,13 @@ const LandingPage: React.FC = () => {
       <section id="pricing" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Choose your plan</h2>
+            <h2 className="text-3xl md:text-5xl font-black mb-4">Transparent Pricing</h2>
             <p className="text-slate-600 dark:text-slate-400">Start for free, upgrade when you're ready to scale your career.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 items-center">
             {/* Basic */}
-            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-transform hover:scale-[1.02]">
               <h3 className="text-lg font-bold mb-2">Free</h3>
               <div className="text-4xl font-black mb-6">$0<span className="text-base font-normal text-slate-500">/mo</span></div>
               <ul className="space-y-4 mb-8 text-sm">
@@ -175,7 +180,7 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Enterprise */}
-            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-transform hover:scale-[1.02]">
               <h3 className="text-lg font-bold mb-2">Agency</h3>
               <div className="text-4xl font-black mb-6">$99<span className="text-base font-normal text-slate-500">/mo</span></div>
               <ul className="space-y-4 mb-8 text-sm">
@@ -192,11 +197,11 @@ const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-slate-100 dark:bg-slate-950 py-12 border-t border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center space-x-3">
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <img src={cvLogo} alt="Logo" className="h-4 w-4 invert brightness-0" />
+          <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
+            <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
+              <BrandLogo className="h-4 w-4" />
             </div>
-            <span className="font-black text-lg">ResumeAI.</span>
+            <span className="font-black text-lg">NextRole.</span>
           </div>
           <div className="flex gap-8 text-sm font-bold text-slate-500">
             <a href="#" className="hover:text-indigo-600 transition-colors">Privacy</a>
@@ -204,7 +209,7 @@ const LandingPage: React.FC = () => {
             <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
           </div>
           <div className="text-xs text-slate-400 font-bold">
-            © {new Date().getFullYear()} ResumeAI. All rights reserved.
+            © {new Date().getFullYear()} NextRole. All rights reserved.
           </div>
         </div>
       </footer>

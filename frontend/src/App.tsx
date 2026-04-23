@@ -2,8 +2,13 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import UploadForm from "./components/UploadForm";
-import cvLogo from "./assets/cv.png";
 import { useNavigate } from "react-router-dom";
+
+const BrandLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 function App() {
   const navigate = useNavigate();
@@ -29,11 +34,11 @@ function App() {
       {/* Premium App Header */}
       <header className="w-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-4 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
-          <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-            <img src={cvLogo} alt="Logo" className="h-6 w-6 invert brightness-0" />
+          <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-500/20">
+            <BrandLogo className="h-6 w-6" />
           </div>
           <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 hidden sm:block">
-            ResumeAI.
+            NextRole.
           </span>
         </div>
         

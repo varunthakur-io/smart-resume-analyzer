@@ -2,8 +2,13 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import cvLogo from "../assets/cv.png";
 import Dashboard from "../components/Dashboard";
+
+const BrandLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 interface Analysis {
   id: string;
@@ -105,11 +110,11 @@ const AnalysisResultPage: React.FC = () => {
       <header className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <img src={cvLogo} alt="Logo" className="h-5 w-5 invert brightness-0" />
+            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform">
+              <BrandLogo className="h-5 w-5" />
             </div>
             <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 hidden sm:block">
-              ResumeAI.
+              NextRole.
             </span>
           </div>
           <div className="flex items-center space-x-3">

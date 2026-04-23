@@ -16,7 +16,19 @@
   }
 }
 
-/* Base styles */
-body {
-  @apply antialiased text-gray-900;
+/* Tailwind 4 class-based dark mode selector */
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply antialiased text-slate-900 bg-slate-50 transition-colors duration-300;
+  }
+  
+  .dark body {
+    @apply text-slate-100 bg-slate-950;
+  }
+}
+
+@utility glass {
+  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800;
 }
