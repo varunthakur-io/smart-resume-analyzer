@@ -129,54 +129,60 @@ const AnalysisResultPage: React.FC = () => {
       {/* Minimal Content */}
       <main className="max-w-6xl mx-auto px-6 py-10">
         {/* Hero-like summary */}
-        <section className="grid md:grid-cols-3 gap-8 items-end">
+        <section className="grid md:grid-cols-3 gap-8 items-end animate-fade-in" style={{ animationDelay: "0.1s" }}>
           <div className="md:col-span-2">
-            <div className="text-sm text-gray-500">Overall Match</div>
-            <div className="mt-2 text-6xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
+            <div className="text-sm text-gray-500 uppercase tracking-widest font-semibold">Overall Match</div>
+            <div className="mt-2 text-7xl md:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500">
               {analysis.match_score}%
             </div>
             {analysis.suggestions && (
-              <p className="mt-4 text-gray-700 leading-relaxed">
+              <p className="mt-6 text-gray-700 leading-relaxed text-lg italic border-l-4 border-blue-200 pl-4">
                 {analysis.suggestions}
               </p>
             )}
           </div>
-          <div className="flex md:justify-end gap-3">
-            <div className="px-4 py-3 rounded-xl bg-green-50 text-green-700 border border-green-100">
-              <div className="text-xs uppercase tracking-wide">Matched</div>
-              <div className="text-2xl font-bold">{matched.length}</div>
+          <div className="flex md:justify-end gap-4">
+            <div className="px-6 py-4 rounded-2xl bg-white shadow-sm border border-green-100 flex flex-col items-center min-w-[120px]">
+              <div className="text-xs uppercase tracking-wide text-green-600 font-bold">Matched</div>
+              <div className="text-3xl font-black text-green-700">{matched.length}</div>
             </div>
-            <div className="px-4 py-3 rounded-xl bg-rose-50 text-rose-700 border border-rose-100">
-              <div className="text-xs uppercase tracking-wide">Missing</div>
-              <div className="text-2xl font-bold">{missing.length}</div>
+            <div className="px-6 py-4 rounded-2xl bg-white shadow-sm border border-rose-100 flex flex-col items-center min-w-[120px]">
+              <div className="text-xs uppercase tracking-wide text-rose-600 font-bold">Missing</div>
+              <div className="text-3xl font-black text-rose-700">{missing.length}</div>
             </div>
           </div>
         </section>
 
         {/* Skills lists */}
-        <section className="mt-10 grid md:grid-cols-2 gap-10">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Matched Skills</h2>
+        <section className="mt-16 grid md:grid-cols-2 gap-12 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="bg-white/50 p-8 rounded-3xl border border-white/20 backdrop-blur-sm shadow-xl">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <span className="w-2 h-6 bg-green-500 rounded-full"></span>
+              Matched Skills
+            </h2>
             {matched.length === 0 ? (
-              <p className="mt-3 text-gray-500">None</p>
+              <p className="mt-4 text-gray-500">None detected in resume.</p>
             ) : (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {matched.map((s, i) => (
-                  <span key={`m-${i}`} className="px-3 py-1.5 rounded-full bg-green-100 text-green-700 text-xs md:text-sm">
+                  <span key={`m-${i}`} className="px-4 py-2 rounded-xl bg-green-50 text-green-700 text-sm font-semibold border border-green-100 hover:scale-105 transition-transform cursor-default">
                     {s}
                   </span>
                 ))}
               </div>
             )}
           </div>
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Missing Skills</h2>
+          <div className="bg-white/50 p-8 rounded-3xl border border-white/20 backdrop-blur-sm shadow-xl">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <span className="w-2 h-6 bg-rose-500 rounded-full"></span>
+              Missing Skills
+            </h2>
             {missing.length === 0 ? (
-              <p className="mt-3 text-gray-500">None</p>
+              <p className="mt-4 text-gray-500">None! You're a perfect match.</p>
             ) : (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {missing.map((s, i) => (
-                  <span key={`x-${i}`} className="px-3 py-1.5 rounded-full bg-rose-100 text-rose-700 text-xs md:text-sm">
+                  <span key={`x-${i}`} className="px-4 py-2 rounded-xl bg-rose-50 text-rose-700 text-sm font-semibold border border-rose-100 hover:scale-105 transition-transform cursor-default">
                     {s}
                   </span>
                 ))}

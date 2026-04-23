@@ -208,22 +208,31 @@ const UploadForm = () => {
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
-            className={`w-full p-6 border-2 rounded-xl ${
+            className={`w-full p-6 border-2 rounded-xl transition-all duration-200 ${
               dragActive
                 ? "border-blue-500 bg-blue-50"
-                : "border-dashed border-gray-300"
-            }`}
+                : "border-dashed border-gray-300 hover:border-blue-300"
+            } ${resume ? "animate-success-pop border-blue-400 bg-blue-50/30" : ""}`}
           >
             <div className="flex flex-col items-center text-center">
+              <svg className={`h-10 w-10 mb-2 transition-colors ${resume ? "text-blue-500" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
               <p className="mt-2 text-sm text-gray-600">
-                Drag and drop your PDF here, or
-                <button
-                  type="button"
-                  className="ml-1 text-blue-700 font-semibold hover:underline"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  browse
-                </button>
+                {resume ? (
+                  <span className="font-semibold text-blue-700">Resume ready for analysis!</span>
+                ) : (
+                  <>
+                    Drag and drop your PDF here, or
+                    <button
+                      type="button"
+                      className="ml-1 text-blue-700 font-semibold hover:underline"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      browse
+                    </button>
+                  </>
+                )}
               </p>
 
               <p className="mt-1 text-xs text-gray-400">
