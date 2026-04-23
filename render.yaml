@@ -5,7 +5,7 @@ services:
     runtime: python
     rootDir: backend
     plan: free # Change to starter if you need more RAM for the model
-    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm && python download_models.py
     startCommand: gunicorn -b 0.0.0.0:$PORT app:app
     envVars:
       - key: PYTHON_VERSION
