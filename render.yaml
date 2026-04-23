@@ -1,0 +1,30 @@
+services:
+  # Backend: Flask API with gunicorn
+  - type: web
+    name: resume-analyzer-api
+    runtime: python
+    rootDir: backend
+    plan: free # Change to starter if you need more RAM for the model
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: CORS_ORIGINS
+        value: "*" # Update this to your frontend URL once deployed
+      - key: DEBUG
+        value: "false"
+
+  # Frontend: React (Static Site)
+  - type: static
+    name: resume-analyzer-ui
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: resume-analyzer-api
+          property: host
