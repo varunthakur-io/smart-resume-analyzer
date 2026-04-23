@@ -3,19 +3,31 @@ import re
 from sentence_transformers import SentenceTransformer, util
 from pathlib import Path
 from functools import lru_cache
-from typing import Dict, List
+from typing import Dict, List, Optional
 import spacy
 
-# Load model only once
-model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+# Load model lazily to speed up boot time and save RAM
+_model: Optional[SentenceTransformer] = None
+
+def get_model():
+    global _model
+    if _model is None:
+        print("DEBUG: Loading SentenceTransformer model...")
+        _model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        print("DEBUG: Model loaded successfully.")
+    return _model
 
 
 # Load spaCy model once
 @lru_cache(maxsize=1)
 def get_nlp():
     try:
-        return spacy.load("en_core_web_sm")
-    except Exception:
+        print("DEBUG: Loading spaCy model...")
+        nlp = spacy.load("en_core_web_sm")
+        print("DEBUG: spaCy model loaded successfully.")
+        return nlp
+    except Exception as e:
+        print(f"ERROR: Could not load spaCy model: {e}")
         # Attempt to download if missing (no-op if offline)
         return spacy.blank("en")
 
@@ -59,6 +71,7 @@ def load_skills_list() -> List[str]:
 @lru_cache(maxsize=1)
 def load_skill_embeddings() -> Dict[str, List[float]]:
     skills = load_skills_list()
+    model = get_model()
     embeddings = model.encode(skills, convert_to_tensor=True)
     # Map skill -> embedding tensor (retain device tensor for cosine sim)
     return {skill: embeddings[i] for i, skill in enumerate(skills)}
@@ -143,6 +156,7 @@ def presence_by_similarity(
     if not phrases:
         return []
     try:
+        model = get_model()
         phrase_embeddings = model.encode(phrases, convert_to_tensor=True)
         sims = util.cos_sim(phrase_embeddings, target_embedding).cpu().numpy().flatten()
         present = [p for p, s in zip(phrases, sims) if s >= threshold]
@@ -161,6 +175,9 @@ def calculate_match_score(resume_text, job_description):
 
         if not resume_text:
             print("WARNING: Resume text is empty!")
+        
+        # Load model only when needed
+        model = get_model()
         
         # Embedding-based similarity (document-level)
         resume_embedding = model.encode(resume_text, convert_to_tensor=True)
@@ -259,6 +276,7 @@ def calculate_match_score(resume_text, job_description):
         }
 
     except Exception as e:
+        print(f"CRITICAL ERROR in calculate_match_score: {e}")
         return {
             "match_score": 0,
             "extracted_skills": [],
