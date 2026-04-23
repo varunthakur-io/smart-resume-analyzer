@@ -6,7 +6,8 @@ from config import HOST, PORT, DEBUG, CORS_ORIGINS
 from services import AnalysisService
 
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": CORS_ORIGINS}})
+# Update CORS to allow all origins during debugging, or specific Render/HF origins
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Logging
 logging.basicConfig(
