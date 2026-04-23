@@ -12,8 +12,8 @@ _model: Optional[SentenceTransformer] = None
 def get_model():
     global _model
     if _model is None:
-        print("DEBUG: Loading SentenceTransformer model...")
-        _model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+        print("DEBUG: Loading SentenceTransformer model (all-MiniLM-L6-v2)...")
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
         print("DEBUG: Model loaded successfully.")
     return _model
 

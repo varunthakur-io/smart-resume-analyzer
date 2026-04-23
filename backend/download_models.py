@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 
 def download_models():
     print("Pre-downloading sentence-transformer model...")
-    model_name = "paraphrase-MiniLM-L6-v2"
+    model_name = "all-MiniLM-L6-v2"
     # This will download the model to the default cache directory (~/.cache/huggingface/hub)
     # Render preserves the build environment, so this will be included in the final image.
     SentenceTransformer(model_name)
