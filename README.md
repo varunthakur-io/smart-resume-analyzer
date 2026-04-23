@@ -1,13 +1,13 @@
 ---
-title: Smart Resume Analyzer
-emoji: 📄
-colorFrom: blue
-colorTo: indigo
+title: NextRole - AI Resume Matcher
+emoji: ⚡
+colorFrom: indigo
+colorTo: blue
 sdk: docker
 pinned: false
 ---
 
-# Smart Resume Analyzer
+# NextRole.
 
 AI-powered resume-to-job-description analyzer with a modern UX and professional backend.
 

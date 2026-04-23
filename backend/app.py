@@ -21,7 +21,7 @@ service = AnalysisService()
 @app.get("/")
 def root():
     """Returns the API status and service name."""
-    return jsonify({"status": "ok", "service": "Smart Resume Analyzer API"})
+    return jsonify({"status": "ok", "service": "NextRole API"})
 
 
 @app.get("/healthz")

@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-Smart Resume Analyzer is an AI-powered monorepo application that analyzes resume-to-job-description matches using semantic embedding similarity. The application provides match scores, extracts skills, identifies missing skills, and offers tailored suggestions for resume improvement.
+NextRole is an AI-powered monorepo application that analyzes resume-to-job-description matches using semantic embedding similarity. The application provides match scores, extracts skills, identifies missing skills, and offers tailored suggestions for resume improvement.
 
 ## Development Commands
 

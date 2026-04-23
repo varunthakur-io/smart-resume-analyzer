@@ -1,6 +1,6 @@
-# Smart Resume Analyzer - Frontend
+# NextRole - Frontend
 
-This is the professional React frontend for the Smart Resume Analyzer. It provides a clean, modern interface for users to upload resumes and receive AI-driven insights.
+This is the professional React frontend for NextRole. It provides a clean, modern interface for users to upload resumes and receive AI-driven insights.
 
 ## Tech Stack
 - **Framework:** [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)

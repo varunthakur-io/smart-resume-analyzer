@@ -1,6 +1,6 @@
-# Smart Resume Analyzer - Backend
+# NextRole - Backend
 
-This is the AI-powered backend for the Smart Resume Analyzer, built with Flask and Python. It leverages Natural Language Processing (NLP) to calculate the semantic similarity between resumes and job descriptions.
+This is the AI-powered backend for NextRole, built with Flask and Python. It leverages Natural Language Processing (NLP) to calculate the semantic similarity between resumes and job descriptions.
 
 ## Tech Stack
 - **Framework:** [Flask](https://flask.palletsprojects.com/)
