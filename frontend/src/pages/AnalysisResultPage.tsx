@@ -5,20 +5,103 @@ import "react-circular-progressbar/dist/styles.css";
 import cvLogo from "../assets/cv.png";
 import Dashboard from "../components/Dashboard";
 
-// ... (Analysis interface remains same)
+interface Analysis {
+  id: string;
+  resume_name: string;
+  match_score: number;
+  extracted_skills?: string[];
+  missing_skills?: string[];
+  suggestions?: string;
+  resume_file?: string | null;
+}
 
 const AnalysisResultPage: React.FC = () => {
-  // ... (state and effects remain same)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteMsg, setDeleteMsg] = useState<string | null>(null);
+  const [resumeDeleted, setResumeDeleted] = useState(false);
+  const [showCharts, setShowCharts] = useState(false);
+  
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark" || 
+    (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)
+  );
 
-  // ... (matched/missing calculation)
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
 
-  const [showCharts, setShowDashboard] = useState(false);
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // ... (download and delete logic)
+  // Safely extract analysis data from router state
+  const analysis = useMemo(() => {
+    const state = location.state as any;
+    return state?.analysis as Analysis | undefined;
+  }, [location.state]);
+
+  const downloadJson = () => {
+    if (!analysis) return;
+    const blob = new Blob([JSON.stringify(analysis, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${analysis.resume_name.replace(/\s+/g, "_")}_analysis.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDeleteResume = async () => {
+    if (!analysis) return;
+    if (!window.confirm("Delete the uploaded resume file from the server? This cannot be undone.")) return;
+    try {
+      setDeleting(true);
+      setDeleteMsg(null);
+      const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_BASE}/resumes/${analysis.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete resume file");
+      setResumeDeleted(true);
+      setDeleteMsg("Resume file deleted from server.");
+    } catch (e: any) {
+      setDeleteMsg(e?.message || "Failed to delete resume file.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (!analysis) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-8">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-10 text-center border border-slate-100 dark:border-slate-800 animate-fade-in">
+          <div className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-4 rounded-2xl inline-block mb-6">
+            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Analysis Data</h1>
+          <p className="text-slate-500 dark:text-slate-400 mb-8">It seems you haven't uploaded a resume yet or the session expired.</p>
+          <button className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all" onClick={() => navigate("/upload")}>
+            Go to Upload
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const matched = Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
+  const missing = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
+  const canShowDelete = !!analysis.resume_file && !resumeDeleted;
+  const scoreColor = analysis.match_score >= 80 ? "#10b981" : analysis.match_score >= 60 ? "#f59e0b" : "#f43f5e";
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-      {/* ... (header remains same) */}
+      {/* Header */}
       <header className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
@@ -49,7 +132,7 @@ const AnalysisResultPage: React.FC = () => {
           {/* Left Panel: Score & Actions */}
           <div className="lg:col-span-4 space-y-8 sticky top-28">
             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center text-center">
-              <div className="w-48 h-48 mb-6 cursor-pointer hover:scale-105 transition-transform" onClick={() => setShowDashboard(!showCharts)}>
+              <div className="w-48 h-48 mb-6 cursor-pointer hover:scale-105 transition-transform" onClick={() => setShowCharts(!showCharts)}>
                 <CircularProgressbar
                   value={analysis.match_score}
                   text={`${analysis.match_score}%`}
@@ -66,7 +149,7 @@ const AnalysisResultPage: React.FC = () => {
               <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mt-2">Overall Compatibility</p>
               
               <button 
-                onClick={() => setShowDashboard(!showCharts)}
+                onClick={() => setShowCharts(!showCharts)}
                 className="mt-6 px-6 py-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 transition-colors"
               >
                 {showCharts ? "Hide Visual Analytics" : "View Visual Analytics"}
@@ -108,7 +191,7 @@ const AnalysisResultPage: React.FC = () => {
                   extractedSkills={matched}
                   missingSkills={missing}
                   resumeName={analysis.resume_name}
-                  onBack={() => setShowDashboard(false)}
+                  onBack={() => setShowCharts(false)}
                 />
               </div>
             )}
