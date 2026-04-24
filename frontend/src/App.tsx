@@ -27,13 +27,15 @@ function App() {
       <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 pt-28">
-        <div className="w-full max-w-4xl">
-          <div className="mb-8 text-center sm:text-left animate-fade-in">
-            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 dark:text-zinc-50 mb-2">Analyze your match.</h2>
-            <p className="text-zinc-500 dark:text-zinc-400 font-medium">Upload your resume and the target job description to reveal AI insights.</p>
+      <main className="flex-1 w-full flex flex-col items-center px-4 sm:px-8 pb-4 sm:pb-8 pt-28">
+        <div className="w-full max-w-5xl flex flex-col">
+          <div className="mb-6 text-center sm:text-left animate-fade-in shrink-0">
+            <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 dark:text-zinc-50 mb-1">Analyze your match.</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">Upload resume and job description to reveal AI insights.</p>
           </div>
-          <UploadForm />
+          <div className="w-full mt-2">
+            <UploadForm />
+          </div>
         </div>
       </main>
 
