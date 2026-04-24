@@ -41,12 +41,12 @@ const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-40 pb-24 overflow-hidden border-b border-zinc-100 dark:border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-3 py-1 text-xs font-medium mb-8 animate-fade-in">
+          <div className="inline-flex items-center rounded-full border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/20 px-3 py-1 text-xs font-medium mb-8 animate-fade-in shadow-sm shadow-green-500/10">
             <span className="relative flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
             </span>
-            <span className="animate-pulse text-emerald-600 dark:text-emerald-400 font-bold">New: Advanced Score Breakdown Now Live</span>
+            <span className="animate-pulse text-green-600 dark:text-green-400 font-black tracking-tight">New: Advanced Score Breakdown Now Live</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 animate-fade-in">
