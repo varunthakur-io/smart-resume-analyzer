@@ -20,7 +20,6 @@ interface Analysis {
 const AnalysisResultPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [deleting, setDeleting] = useState(false);
   const [deleteMsg, setDeleteMsg] = useState<string | null>(null);
   const [resumeDeleted, setResumeDeleted] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
@@ -43,8 +42,8 @@ const AnalysisResultPage: React.FC = () => {
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   const analysis = useMemo(() => {
-    const state = location.state as any;
-    return state?.analysis as Analysis | undefined;
+    const state = location.state as { analysis?: Analysis };
+    return state?.analysis;
   }, [location.state]);
 
   const downloadJson = () => {
@@ -68,10 +67,8 @@ const AnalysisResultPage: React.FC = () => {
       if (!res.ok) throw new Error();
       setResumeDeleted(true);
       setDeleteMsg("File purged.");
-    } catch (e) {
+    } catch {
       setDeleteMsg("Failed to delete.");
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -89,7 +86,6 @@ const AnalysisResultPage: React.FC = () => {
   const matched = Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
   const missing = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
   const canShowDelete = !!analysis.resume_file && !resumeDeleted;
-  const scoreColor = analysis.match_score >= 80 ? "#10b981" : analysis.match_score >= 60 ? "#f59e0b" : "#f43f5e";
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">
@@ -104,7 +100,7 @@ const AnalysisResultPage: React.FC = () => {
         }
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 pt-32 animate-fade-in">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 pt-32 sm:pt-40 animate-fade-in">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
           {/* Left: Score */}
