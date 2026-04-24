@@ -14,21 +14,55 @@
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
   }
+
+  /* Shadcn-like Zinc Palette */
+  --color-border: var(--color-zinc-200);
+  --color-input: var(--color-zinc-200);
+  --color-ring: var(--color-zinc-950);
+  --color-background: #ffffff;
+  --color-foreground: var(--color-zinc-950);
+  
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
 }
 
 /* Tailwind 4 class-based dark mode selector */
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  * {
+    @apply border-zinc-200 dark:border-zinc-800;
+  }
+
   body {
-    @apply antialiased text-slate-900 bg-slate-50 transition-colors duration-300;
+    @apply antialiased text-zinc-950 bg-white transition-colors duration-300;
   }
   
   .dark body {
-    @apply text-slate-100 bg-slate-950;
+    @apply text-zinc-50 bg-zinc-950;
   }
 }
 
-@utility glass {
-  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800;
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md border border-zinc-200 dark:border-zinc-800;
+  }
+}
+
+/* Shadcn Button Defaults */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 disabled:pointer-events-none disabled:opacity-50 bg-zinc-900 text-zinc-50 shadow hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90 h-9 px-4 py-2;
+}
+
+@utility btn-secondary {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-100/80 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800/80 h-9 px-4 py-2;
+}
+
+@utility btn-outline {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 disabled:pointer-events-none disabled:opacity-50 border border-zinc-200 bg-transparent shadow-sm hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 h-9 px-4 py-2;
+}
+
+@utility btn-ghost {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 h-9 px-4 py-2;
 }
