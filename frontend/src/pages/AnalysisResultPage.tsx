@@ -182,6 +182,7 @@ const AnalysisResultPage: React.FC = () => {
                   missingSkills={missing}
                   resumeName={analysis.resume_name}
                   onBack={() => setShowCharts(false)}
+                  breakdown={analysis.breakdown}
                 />
               </div>
             )}
