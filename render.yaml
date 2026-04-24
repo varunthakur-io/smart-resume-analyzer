@@ -1,7 +1,7 @@
 services:
   # Frontend: React (Static Site)
   - type: web
-    name: nextrole
+    name: resume-analyzer-ui
     runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
