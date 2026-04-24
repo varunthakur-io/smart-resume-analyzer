@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar, { BrandLogo } from "../components/Navbar";
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,14 +22,14 @@ const LandingPage: React.FC = () => {
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 transition-colors duration-300 selection:bg-zinc-900 selection:text-zinc-50 dark:selection:bg-zinc-50 dark:selection:text-zinc-950">
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
         showLinks={true}
         actions={
           <button 
-            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95"
+            className="btn-primary h-9 px-4 rounded-md"
             onClick={() => navigate("/upload")}
           >
             Get Started
@@ -38,76 +38,62 @@ const LandingPage: React.FC = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* ... (rest of the Hero content) */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-500/10 blur-[120px] rounded-full" />
-        </div>
-
+      <section className="relative pt-40 pb-24 overflow-hidden border-b border-zinc-100 dark:border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center px-4 py-1.5 mb-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 animate-fade-in">
-            <span className="flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
+          <div className="inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-3 py-1 text-xs font-medium mb-8 animate-fade-in">
+            <span className="relative flex h-2 w-2 mr-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-zinc-500"></span>
             </span>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest text-[10px] sm:text-xs">Next-Gen Resume Intelligence</span>
+            New: Advanced Score Breakdown Now Live
           </div>
           
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 animate-fade-in">
-            Unlock your <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400">
-              NextRole.
-            </span>
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 animate-fade-in">
+            Landing your next role <br />
+            <span className="text-zinc-500 dark:text-zinc-400">shouldn't be a mystery.</span>
           </h1>
           
-          <p className="max-w-2xl mx-auto text-xl text-slate-600 dark:text-slate-400 mb-10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            The AI-powered platform that analyzes job descriptions and reveals exactly why you're not getting called back. Stop guessing, start landing.
+          <p className="max-w-2xl mx-auto text-lg text-zinc-600 dark:text-zinc-400 mb-10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            The minimal resume intelligence platform that analyzes job descriptions and reveals exactly where your profile aligns.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <button 
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-black transition-all shadow-xl shadow-indigo-500/25 hover:-translate-y-1"
+              className="btn-primary h-12 px-8 text-base rounded-md"
               onClick={() => navigate("/upload")}
             >
-              Analyze My Resume
+              Analyze Resume
             </button>
-            <button className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-lg font-black border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all hover:-translate-y-1">
-              Watch Demo
+            <button className="btn-outline h-12 px-8 text-base rounded-md">
+              View Demo
             </button>
           </div>
 
-          {/* Social Proof Placeholder */}
-          <div className="mt-20 opacity-50 grayscale dark:invert transition-all">
-            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] mb-8">Empowering candidates worldwide</p>
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center font-black text-xl sm:text-2xl">
-              <span>GOOGLE</span>
-              <span>AMAZON</span>
-              <span>META</span>
-              <span>STRIPE</span>
+          <div className="mt-20">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-400 mb-8">Used by professionals at</p>
+            <div className="flex flex-wrap justify-center gap-12 items-center grayscale opacity-40 transition-all">
+              <span className="text-xl font-bold tracking-tighter">GITHUB</span>
+              <span className="text-xl font-bold tracking-tighter">LINEAR</span>
+              <span className="text-xl font-bold tracking-tighter">VERCEL</span>
+              <span className="text-xl font-bold tracking-tighter">RAILWAY</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Feature Grid */}
-      <section id="features" className="py-24 bg-white dark:bg-slate-900/50">
+      <section id="features" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Everything you need to land the job.</h2>
-            <p className="text-slate-600 dark:text-slate-400">Built for modern professionals who value data-driven results.</p>
-          </div>
-          
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: "Semantic Analysis", desc: "Our AI understands context, not just keywords. It knows that 'Coding' is related to 'Software Engineering'.", icon: "🧠" },
-              { title: "ATS Optimization", desc: "Identify the critical gaps that cause Applicant Tracking Systems to filter out your profile automatically.", icon: "⚡" },
-              { title: "Skill Gap Map", desc: "A visual heat-map of your strengths versus what the employer is actually looking for.", icon: "📊" }
+              { title: "Semantic Analysis", desc: "Our AI understands context, mapping your experience directly to Job Requirements.", icon: "01" },
+              { title: "ATS Optimization", desc: "Identify the critical gaps that cause systems to filter out your profile automatically.", icon: "02" },
+              { title: "Skill Insights", desc: "A granular breakdown of your strengths versus what the employer is seeking.", icon: "03" }
             ].map((f, i) => (
-              <div key={i} className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 hover:border-indigo-500 transition-all hover:shadow-2xl hover:shadow-indigo-500/10 group">
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{f.icon}</div>
-                <h3 className="text-xl font-black mb-3">{f.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{f.desc}</p>
+              <div key={i} className="group relative p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-all">
+                <div className="text-xs font-bold text-zinc-400 mb-4 tracking-tighter">{f.icon}</div>
+                <h3 className="text-lg font-bold mb-2">{f.title}</h3>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -115,73 +101,69 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24">
+      <section id="pricing" className="py-24 border-t border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Transparent Pricing</h2>
-            <p className="text-slate-600 dark:text-slate-400">Start for free, upgrade when you're ready to scale your career.</p>
+            <h2 className="text-3xl font-bold mb-4 tracking-tight">Simple Pricing</h2>
+            <p className="text-zinc-600 dark:text-zinc-400">Everything you need, nothing you don't.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 items-center">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Basic */}
-            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-transform hover:scale-[1.02]">
-              <h3 className="text-lg font-bold mb-2">Free</h3>
-              <div className="text-4xl font-black mb-6">$0<span className="text-base font-normal text-slate-500">/mo</span></div>
-              <ul className="space-y-4 mb-8 text-sm">
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ 5 Analyses per month</li>
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ Basic Match Score</li>
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ Skill Extraction</li>
+            <div className="flex flex-col p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+              <h3 className="font-bold mb-2">Free</h3>
+              <div className="text-3xl font-bold mb-6">$0</div>
+              <ul className="space-y-3 mb-8 text-sm text-zinc-600 dark:text-zinc-400 flex-1">
+                <li>• 5 Analyses / mo</li>
+                <li>• Basic Match Score</li>
+                <li>• Skill Extraction</li>
               </ul>
-              <button className="w-full py-3 rounded-xl border border-indigo-600 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all">Get Started</button>
+              <button className="btn-outline w-full" onClick={() => navigate("/upload")}>Get Started</button>
             </div>
 
-            {/* Pro - Featured */}
-            <div className="p-8 rounded-3xl bg-indigo-600 text-white transform scale-105 shadow-2xl shadow-indigo-500/40 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-indigo-500 px-4 py-1 rounded-bl-xl text-xs font-black uppercase tracking-widest">Most Popular</div>
-              <h3 className="text-lg font-bold mb-2">Pro</h3>
-              <div className="text-4xl font-black mb-6">$19<span className="text-base font-normal opacity-80">/mo</span></div>
-              <ul className="space-y-4 mb-8 text-sm">
-                <li className="flex items-center">✓ Unlimited Analyses</li>
-                <li className="flex items-center">✓ Deep Semantic Insights</li>
-                <li className="flex items-center">✓ ATS Gap Fixer</li>
-                <li className="flex items-center">✓ Custom AI Suggestions</li>
+            {/* Pro */}
+            <div className="flex flex-col p-8 rounded-xl border border-zinc-950 dark:border-zinc-50 bg-zinc-950 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-950 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-zinc-50 dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-tighter">Popular</div>
+              <h3 className="font-bold mb-2">Pro</h3>
+              <div className="text-3xl font-bold mb-6">$19</div>
+              <ul className="space-y-3 mb-8 text-sm flex-1 opacity-90">
+                <li>• Unlimited Analyses</li>
+                <li>• Semantic Insights</li>
+                <li>• Custom AI Advice</li>
+                <li>• PDF & Word Support</li>
               </ul>
-              <button className="w-full py-3 rounded-xl bg-white text-indigo-600 font-black hover:bg-indigo-50 transition-all">Start Free Trial</button>
+              <button className="w-full h-9 rounded-md font-bold text-sm bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 hover:opacity-90 transition-opacity">Try Free</button>
             </div>
 
-            {/* Enterprise */}
-            <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-transform hover:scale-[1.02]">
-              <h3 className="text-lg font-bold mb-2">Agency</h3>
-              <div className="text-4xl font-black mb-6">$99<span className="text-base font-normal text-slate-500">/mo</span></div>
-              <ul className="space-y-4 mb-8 text-sm">
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ Multi-user Access</li>
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ API Access</li>
-                <li className="flex items-center text-slate-600 dark:text-slate-400">✓ Bulk Resume Processing</li>
+            {/* Agency */}
+            <div className="flex flex-col p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+              <h3 className="font-bold mb-2">Enterprise</h3>
+              <div className="text-3xl font-bold mb-6">Custom</div>
+              <ul className="space-y-3 mb-8 text-sm text-zinc-600 dark:text-zinc-400 flex-1">
+                <li>• Team Management</li>
+                <li>• API Access</li>
+                <li>• Bulk Processing</li>
               </ul>
-              <button className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Contact Sales</button>
+              <button className="btn-outline w-full">Contact Sales</button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-100 dark:bg-slate-950 py-12 border-t border-slate-200 dark:border-slate-800">
+      <footer className="py-12 border-t border-zinc-100 dark:border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
-            <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span className="font-black text-lg">NextRole.</span>
+          <div className="flex items-center space-x-2">
+            <BrandLogo className="h-4 w-4" />
+            <span className="font-bold text-sm tracking-tight">NextRole</span>
           </div>
-          <div className="flex gap-8 text-sm font-bold text-slate-500">
-            <a href="#" className="hover:text-indigo-600 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">Terms</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
+          <div className="flex gap-8 text-xs font-medium text-zinc-500">
+            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Terms</a>
+            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Twitter</a>
           </div>
-          <div className="text-xs text-slate-400 font-bold">
-            © {new Date().getFullYear()} NextRole. All rights reserved.
+          <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+            © {new Date().getFullYear()} NextRole
           </div>
         </div>
       </footer>

@@ -59,17 +59,16 @@ const AnalysisResultPage: React.FC = () => {
 
   const handleDeleteResume = async () => {
     if (!analysis) return;
-    if (!window.confirm("Delete the uploaded resume file from the server? This cannot be undone.")) return;
+    if (!window.confirm("Delete original file?")) return;
     try {
       setDeleting(true);
-      setDeleteMsg(null);
       const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_BASE}/resumes/${analysis.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete resume file");
+      if (!res.ok) throw new Error();
       setResumeDeleted(true);
-      setDeleteMsg("Resume file deleted from server.");
-    } catch (e: any) {
-      setDeleteMsg(e?.message || "Failed to delete resume file.");
+      setDeleteMsg("File deleted.");
+    } catch (e) {
+      setDeleteMsg("Failed to delete.");
     } finally {
       setDeleting(false);
     }
@@ -77,18 +76,10 @@ const AnalysisResultPage: React.FC = () => {
 
   if (!analysis) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-10 text-center border border-slate-100 dark:border-slate-800 animate-fade-in">
-          <div className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-4 rounded-2xl inline-block mb-6">
-            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Analysis Data</h1>
-          <p className="text-slate-500 dark:text-slate-400 mb-8">It seems you haven't uploaded a resume yet or the session expired.</p>
-          <button className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all" onClick={() => navigate("/upload")}>
-            Go to Upload
-          </button>
+      <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center p-8">
+        <div className="max-w-md w-full text-center p-12 border border-zinc-200 dark:border-zinc-800 rounded-xl animate-fade-in">
+          <h1 className="text-xl font-bold mb-4">No Analysis Found</h1>
+          <button className="btn-primary w-full" onClick={() => navigate("/upload")}>Return to Upload</button>
         </div>
       </div>
     );
@@ -97,85 +88,92 @@ const AnalysisResultPage: React.FC = () => {
   const matched = Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
   const missing = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
   const canShowDelete = !!analysis.resume_file && !resumeDeleted;
-  const scoreColor = analysis.match_score >= 80 ? "#10b981" : analysis.match_score >= 60 ? "#f59e0b" : "#f43f5e";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 transition-colors duration-300">
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
         actions={
-          <div className="flex items-center space-x-3">
-            <button className="hidden sm:block px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 transition-all" onClick={() => navigate("/upload")}>
-              New Analysis
-            </button>
-            <button className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20" onClick={downloadJson}>
-              Export JSON
-            </button>
+          <div className="flex items-center space-x-2">
+            <button className="btn-secondary h-8 text-xs px-3 rounded-md" onClick={() => navigate("/upload")}>New</button>
+            <button className="btn-primary h-8 text-xs px-3 rounded-md" onClick={downloadJson}>Export</button>
           </div>
         }
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-10 pt-28 animate-fade-in">
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 pt-32 animate-fade-in">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
-          {/* Left Panel: Score & Actions */}
-          <div className="lg:col-span-4 space-y-8 sticky top-28">
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center text-center">
-              <div className="w-48 h-48 mb-6 cursor-pointer hover:scale-105 transition-transform" onClick={() => setShowCharts(!showCharts)}>
-                <CircularProgressbar
-                  value={analysis.match_score}
-                  text={`${analysis.match_score}%`}
-                  strokeWidth={10}
-                  styles={buildStyles({
-                    pathColor: scoreColor,
-                    textColor: isDarkMode ? "#fff" : "#0f172a",
-                    trailColor: isDarkMode ? "#1e293b" : "#f1f5f9",
-                    pathTransitionDuration: 1.5,
-                  })}
-                />
-              </div>
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white truncate w-full">{analysis.resume_name}</h1>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mt-2">Overall Compatibility</p>
-              
-              <button 
-                onClick={() => setShowCharts(!showCharts)}
-                className="mt-6 px-6 py-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 transition-colors"
-              >
-                {showCharts ? "Hide Visual Analytics" : "View Visual Analytics"}
-              </button>
-
-              <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-8" />
-              
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="p-4 rounded-3xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 text-center">
-                  <div className="text-3xl font-black text-green-600">{matched.length}</div>
-                  <div className="text-[10px] font-black uppercase text-green-600/70 tracking-tighter">Matched Skills</div>
-                </div>
-                <div className="p-4 rounded-3xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/30 text-center">
-                  <div className="text-3xl font-black text-rose-600">{missing.length}</div>
-                  <div className="text-[10px] font-black uppercase text-rose-600/70 tracking-tighter">Missing Gaps</div>
-                </div>
-              </div>
-
-              {canShowDelete && (
-                <button
-                  onClick={handleDeleteResume}
-                  disabled={deleting}
-                  className="mt-8 text-xs font-black text-rose-500 hover:text-rose-600 uppercase tracking-widest transition-colors flex items-center gap-2"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  {deleting ? "Purging File..." : "Purge Resume from Server"}
-                </button>
-              )}
-              {deleteMsg && <p className="mt-4 text-xs font-bold text-green-500">{deleteMsg}</p>}
+          {/* Left: Score */}
+          <div className="lg:col-span-4 flex flex-col items-center text-center lg:sticky lg:top-32">
+            <div className="w-56 h-56 mb-8 group relative">
+              <CircularProgressbar
+                value={analysis.match_score}
+                text={`${analysis.match_score}%`}
+                strokeWidth={7}
+                styles={buildStyles({
+                  pathColor: isDarkMode ? "#fafafa" : "#18181b",
+                  textColor: isDarkMode ? "#fafafa" : "#18181b",
+                  trailColor: isDarkMode ? "#27272a" : "#f4f4f5",
+                  pathTransitionDuration: 1.5,
+                })}
+              />
+              <div className="absolute inset-0 rounded-full bg-zinc-900/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
+
+            <div className="space-y-1 w-full overflow-hidden px-4">
+              <h1 className="text-2xl font-bold tracking-tight truncate w-full max-w-[250px] lg:max-w-full" title={analysis.resume_name}>{analysis.resume_name}</h1>
+              <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em]">Match Accuracy</p>
+            </div>
+            
+            <button 
+              onClick={() => setShowCharts(!showCharts)}
+              className={`mt-8 w-full max-w-[240px] py-3 rounded-md text-xs font-black uppercase tracking-widest transition-all border ${
+                showCharts 
+                ? "bg-zinc-900 text-zinc-50 border-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 dark:border-zinc-50" 
+                : "bg-transparent text-zinc-900 border-zinc-200 hover:border-zinc-900 dark:text-zinc-50 dark:border-zinc-800 dark:hover:border-zinc-50"
+              }`}
+            >
+              {showCharts ? "Hide Visual Analytics" : "View Visual Analytics"}
+            </button>
+
+            <div className="w-full h-px bg-zinc-100 dark:bg-zinc-900 my-10" />
+            
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30">
+                <div className="text-3xl font-bold tracking-tighter">{matched.length}</div>
+                <div className="text-[10px] font-bold uppercase text-zinc-400 mt-1">Matched</div>
+              </div>
+              <div className="p-5 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/20">
+                <div className="text-3xl font-bold tracking-tighter text-red-600 dark:text-red-500">{missing.length}</div>
+                <div className="text-[10px] font-bold uppercase text-red-500 dark:text-red-400 mt-1">Gaps</div>
+              </div>
+            </div>
+
+            {canShowDelete && (
+              <button 
+                onClick={handleDeleteResume} 
+                disabled={deleting}
+                className="mt-10 w-full max-w-[240px] flex items-center justify-center gap-2 py-3 rounded-md text-xs font-black uppercase tracking-widest transition-all border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-500 dark:hover:bg-red-900/20 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Analysis Data
+                  </>
+                )}
+              </button>
+            )}
+            {deleteMsg && <p className="mt-4 text-[10px] font-bold text-zinc-400">{deleteMsg}</p>}
           </div>
 
-          {/* Right Panel: Detailed Insights */}
-          <div className="lg:col-span-8 space-y-8">
+          {/* Right: Data */}
+          <div className="lg:col-span-8 space-y-16">
             {showCharts && (
-              <div className="animate-fade-in">
+              <div className="animate-fade-in pb-12 border-b border-zinc-100 dark:border-zinc-900">
                 <Dashboard 
                   matchScore={analysis.match_score}
                   extractedSkills={matched}
@@ -183,59 +181,56 @@ const AnalysisResultPage: React.FC = () => {
                   resumeName={analysis.resume_name}
                   onBack={() => setShowCharts(false)}
                   breakdown={analysis.breakdown}
+                  isDarkMode={isDarkMode}
                 />
               </div>
             )}
 
-            {/* AI Suggestions Checklist */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 dark:border-slate-800">
-              <h2 className="text-xl font-black text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                <span className="bg-indigo-600 text-white p-2 rounded-xl text-sm">✨</span>
-                AI-Generated Action Plan
-              </h2>
-              <div className="space-y-4">
-                {analysis.suggestions ? analysis.suggestions.split(". ").filter(s => s.trim()).map((step, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                    <div className="mt-1 h-5 w-5 rounded-full border-2 border-indigo-500 flex-shrink-0 group-hover:bg-indigo-500 transition-colors" />
-                    <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{step.trim()}.</p>
-                  </div>
-                )) : (
-                  <p className="text-slate-400 italic">No specific suggestions generated for this analysis.</p>
-                )}
+            {/* AI Action Plan */}
+            <section className="space-y-8">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">Action Plan</h2>
+                <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-900" />
               </div>
-            </div>
+              <div className="grid gap-4">
+                {analysis.suggestions ? analysis.suggestions.split(". ").filter(s => s.trim()).map((step, i) => (
+                  <div key={i} className="flex gap-5 p-6 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-950 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="mt-1.5 h-2 w-2 rounded-full bg-zinc-900 dark:bg-zinc-50 flex-shrink-0" />
+                    <p className="text-sm font-medium leading-relaxed text-zinc-700 dark:text-zinc-300">{step.trim()}.</p>
+                  </div>
+                )) : <p className="text-sm text-zinc-400 italic font-medium">No strategic suggestions available for this profile.</p>}
+              </div>
+            </section>
 
-            {/* Skills Deep Dive */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Matched */}
-              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 dark:border-slate-800">
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  Strengths Detected
-                </h3>
+            {/* Skills Matrix */}
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
+              <section className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">Strengths</h3>
+                  <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-900" />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {matched.length > 0 ? matched.map((s, i) => (
-                    <span key={i} className="px-4 py-2 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 text-xs font-black uppercase tracking-widest border border-green-100 dark:border-green-800/30 hover:scale-105 transition-transform cursor-default">
+                    <span key={i} className="inline-flex items-center rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-3 py-1 text-[11px] font-bold uppercase tracking-tight text-zinc-700 dark:text-zinc-300 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800">
                       {s}
                     </span>
-                  )) : <p className="text-slate-400 text-sm italic">No significant strengths identified.</p>}
+                  )) : <p className="text-xs text-zinc-400 italic">No significant keyword matches detected.</p>}
                 </div>
-              </div>
+              </section>
 
-              {/* Missing */}
-              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 dark:border-slate-800">
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-rose-500" />
-                  Critical Gaps
-                </h3>
+              <section className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">Gaps</h3>
+                  <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-900" />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {missing.length > 0 ? missing.map((s, i) => (
-                    <span key={i} className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/10 text-rose-700 dark:text-rose-400 text-xs font-black uppercase tracking-widest border border-rose-100 dark:border-rose-800/30 hover:scale-105 transition-transform cursor-default">
+                    <span key={i} className="inline-flex items-center rounded-md border border-red-200 dark:border-red-900/50 px-3 py-1 text-[11px] font-bold uppercase tracking-tight text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
                       {s}
                     </span>
-                  )) : <p className="text-slate-400 text-sm italic">You've hit every requirement!</p>}
+                  )) : <p className="text-xs text-zinc-400 italic">Resume aligns with all critical requirements.</p>}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
 
