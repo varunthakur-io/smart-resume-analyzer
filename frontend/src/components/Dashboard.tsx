@@ -6,23 +6,17 @@ import {
 } from "recharts";
 
 interface DashboardProps {
-  matchScore: number;
   extractedSkills?: string[];
   missingSkills?: string[];
-  suggestions?: string;
   resumeName?: string;
-  onBack?: () => void;
   isDarkMode?: boolean;
   breakdown?: Record<string, number>;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
-  matchScore,
   extractedSkills = [],
   missingSkills = [],
-  suggestions,
   resumeName,
-  onBack,
   breakdown = {},
   isDarkMode = false,
 }) => {
@@ -59,6 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     </div>
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
