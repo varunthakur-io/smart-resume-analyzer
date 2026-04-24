@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import UploadForm from "./components/UploadForm";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(
@@ -35,6 +36,8 @@ function App() {
           <UploadForm />
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar, { BrandLogo } from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const LandingPage: React.FC = () => {
 
           <div className="mt-20">
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-400 mb-8">Used by professionals at</p>
-            <div className="flex flex-wrap justify-center gap-12 items-center grayscale opacity-40 transition-all">
+            <div className="flex flex-wrap justify-center gap-12 items-center grayscale opacity-40 dark:invert transition-all">
               <span className="text-xl font-bold tracking-tighter">GITHUB</span>
               <span className="text-xl font-bold tracking-tighter">LINEAR</span>
               <span className="text-xl font-bold tracking-tighter">VERCEL</span>
@@ -150,23 +151,7 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-zinc-100 dark:border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center space-x-2">
-            <BrandLogo className="h-4 w-4" />
-            <span className="font-bold text-sm tracking-tight">NextRole</span>
-          </div>
-          <div className="flex gap-8 text-xs font-medium text-zinc-500">
-            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Terms</a>
-            <a href="#" className="hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors">Twitter</a>
-          </div>
-          <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-            © {new Date().getFullYear()} NextRole
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

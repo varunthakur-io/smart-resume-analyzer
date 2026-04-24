@@ -4,6 +4,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import Dashboard from "../components/Dashboard";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 interface Analysis {
   id: string;
@@ -66,7 +67,7 @@ const AnalysisResultPage: React.FC = () => {
       const res = await fetch(`${API_BASE}/resumes/${analysis.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       setResumeDeleted(true);
-      setDeleteMsg("File deleted.");
+      setDeleteMsg("File purged.");
     } catch (e) {
       setDeleteMsg("Failed to delete.");
     } finally {
@@ -88,9 +89,10 @@ const AnalysisResultPage: React.FC = () => {
   const matched = Array.isArray(analysis.extracted_skills) ? analysis.extracted_skills : [];
   const missing = Array.isArray(analysis.missing_skills) ? analysis.missing_skills : [];
   const canShowDelete = !!analysis.resume_file && !resumeDeleted;
+  const scoreColor = analysis.match_score >= 80 ? "#10b981" : analysis.match_score >= 60 ? "#f59e0b" : "#f43f5e";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleDarkMode={toggleDarkMode} 
@@ -122,8 +124,8 @@ const AnalysisResultPage: React.FC = () => {
               <div className="absolute inset-0 rounded-full bg-zinc-900/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
-            <div className="space-y-1 w-full overflow-hidden px-4">
-              <h1 className="text-2xl font-bold tracking-tight truncate w-full max-w-[250px] lg:max-w-full" title={analysis.resume_name}>{analysis.resume_name}</h1>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight">{analysis.resume_name}</h1>
               <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em]">Match Accuracy</p>
             </div>
             
@@ -141,30 +143,19 @@ const AnalysisResultPage: React.FC = () => {
             <div className="w-full h-px bg-zinc-100 dark:bg-zinc-900 my-10" />
             
             <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30">
+              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30 text-center">
                 <div className="text-3xl font-bold tracking-tighter">{matched.length}</div>
                 <div className="text-[10px] font-bold uppercase text-zinc-400 mt-1">Matched</div>
               </div>
-              <div className="p-5 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/20">
-                <div className="text-3xl font-bold tracking-tighter text-red-600 dark:text-red-500">{missing.length}</div>
-                <div className="text-[10px] font-bold uppercase text-red-500 dark:text-red-400 mt-1">Gaps</div>
+              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30 text-center">
+                <div className="text-3xl font-bold tracking-tighter">{missing.length}</div>
+                <div className="text-[10px] font-bold uppercase text-zinc-400 mt-1">Gaps</div>
               </div>
             </div>
 
             {canShowDelete && (
-              <button 
-                onClick={handleDeleteResume} 
-                disabled={deleting}
-                className="mt-10 w-full max-w-[240px] flex items-center justify-center gap-2 py-3 rounded-md text-xs font-black uppercase tracking-widest transition-all border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-500 dark:hover:bg-red-900/20 disabled:opacity-50"
-              >
-                {deleting ? "Deleting..." : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete Analysis Data
-                  </>
-                )}
+              <button onClick={handleDeleteResume} className="mt-10 text-[10px] font-bold text-zinc-400 hover:text-red-500 uppercase tracking-widest transition-colors">
+                Purge Analysis Data
               </button>
             )}
             {deleteMsg && <p className="mt-4 text-[10px] font-bold text-zinc-400">{deleteMsg}</p>}
@@ -225,7 +216,7 @@ const AnalysisResultPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {missing.length > 0 ? missing.map((s, i) => (
-                    <span key={i} className="inline-flex items-center rounded-md border border-red-200 dark:border-red-900/50 px-3 py-1 text-[11px] font-bold uppercase tracking-tight text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                    <span key={i} className="inline-flex items-center rounded-md border border-zinc-200 dark:border-zinc-800 px-3 py-1 text-[11px] font-bold uppercase tracking-tight opacity-50 text-zinc-500 hover:opacity-100 transition-opacity">
                       {s}
                     </span>
                   )) : <p className="text-xs text-zinc-400 italic">Resume aligns with all critical requirements.</p>}
@@ -236,6 +227,8 @@ const AnalysisResultPage: React.FC = () => {
 
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };
