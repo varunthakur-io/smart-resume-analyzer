@@ -130,7 +130,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
               <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip />} />
               <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={50}>
-                {skillData.map((_entry, index) => (
+                {skillData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Bar>

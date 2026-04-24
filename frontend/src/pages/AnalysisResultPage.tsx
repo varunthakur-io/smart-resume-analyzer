@@ -20,6 +20,7 @@ interface Analysis {
 const AnalysisResultPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
   const [deleteMsg, setDeleteMsg] = useState<string | null>(null);
   const [resumeDeleted, setResumeDeleted] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
@@ -69,6 +70,8 @@ const AnalysisResultPage: React.FC = () => {
       setDeleteMsg("File purged.");
     } catch {
       setDeleteMsg("Failed to delete.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -120,8 +123,8 @@ const AnalysisResultPage: React.FC = () => {
               <div className="absolute inset-0 rounded-full bg-zinc-900/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold tracking-tight">{analysis.resume_name}</h1>
+            <div className="space-y-1 w-full overflow-hidden px-4">
+              <h1 className="text-2xl font-bold tracking-tight truncate w-full max-w-[250px] lg:max-w-full" title={analysis.resume_name}>{analysis.resume_name}</h1>
               <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em]">Match Accuracy</p>
             </div>
             
@@ -139,19 +142,23 @@ const AnalysisResultPage: React.FC = () => {
             <div className="w-full h-px bg-zinc-100 dark:bg-zinc-900 my-10" />
             
             <div className="grid grid-cols-2 gap-4 w-full">
-              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30 text-center">
+              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30">
                 <div className="text-3xl font-bold tracking-tighter">{matched.length}</div>
                 <div className="text-[10px] font-bold uppercase text-zinc-400 mt-1">Matched</div>
               </div>
-              <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/30 dark:bg-zinc-900/30 text-center">
-                <div className="text-3xl font-bold tracking-tighter">{missing.length}</div>
-                <div className="text-[10px] font-bold uppercase text-zinc-400 mt-1">Gaps</div>
+              <div className="p-5 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50/50 dark:bg-red-900/20">
+                <div className="text-3xl font-bold tracking-tighter text-red-600 dark:text-red-500">{missing.length}</div>
+                <div className="text-[10px] font-bold uppercase text-red-500 dark:text-red-400 mt-1">Gaps</div>
               </div>
             </div>
 
             {canShowDelete && (
-              <button onClick={handleDeleteResume} className="mt-10 text-[10px] font-bold text-zinc-400 hover:text-red-500 uppercase tracking-widest transition-colors">
-                Purge Analysis Data
+              <button 
+                onClick={handleDeleteResume} 
+                disabled={deleting}
+                className="mt-10 w-full max-w-[240px] flex items-center justify-center gap-2 py-3 rounded-md text-xs font-black uppercase tracking-widest transition-all border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-500 dark:hover:bg-red-900/20 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete Analysis Data"}
               </button>
             )}
             {deleteMsg && <p className="mt-4 text-[10px] font-bold text-zinc-400">{deleteMsg}</p>}
@@ -162,11 +169,9 @@ const AnalysisResultPage: React.FC = () => {
             {showCharts && (
               <div className="animate-fade-in pb-12 border-b border-zinc-100 dark:border-zinc-900">
                 <Dashboard 
-                  matchScore={analysis.match_score}
                   extractedSkills={matched}
                   missingSkills={missing}
                   resumeName={analysis.resume_name}
-                  onBack={() => setShowCharts(false)}
                   breakdown={analysis.breakdown}
                   isDarkMode={isDarkMode}
                 />
@@ -212,7 +217,7 @@ const AnalysisResultPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {missing.length > 0 ? missing.map((s, i) => (
-                    <span key={i} className="inline-flex items-center rounded-md border border-zinc-200 dark:border-zinc-800 px-3 py-1 text-[11px] font-bold uppercase tracking-tight opacity-50 text-zinc-500 hover:opacity-100 transition-opacity">
+                    <span key={i} className="inline-flex items-center rounded-md border border-red-200 dark:border-red-900/50 px-3 py-1 text-[11px] font-bold uppercase tracking-tight text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
                       {s}
                     </span>
                   )) : <p className="text-xs text-zinc-400 italic">Resume aligns with all critical requirements.</p>}
