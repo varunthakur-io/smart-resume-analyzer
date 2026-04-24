@@ -13,6 +13,7 @@ interface DashboardProps {
   resumeName?: string;
   onBack?: () => void;
   isDarkMode?: boolean;
+  breakdown?: Record<string, number>;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -134,7 +135,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
               <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip />} />
               <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={50}>
-                {skillData.map((entry, index) => (
+                {skillData.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Bar>
@@ -177,7 +178,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   textTransform: 'uppercase', 
                   letterSpacing: '0.2em', 
                   color: '#71717a',
-                  paddingTop: '20px'
+                  paddingTop: '40px'
                 }} 
               />
             </PieChart>
