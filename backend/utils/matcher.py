@@ -41,6 +41,50 @@ CANDIDATE_SIM_THRESHOLD = float(os.getenv("CANDIDATE_SIM_THRESHOLD", "0.58"))
 MIN_CANDIDATE_LEN = int(os.getenv("MIN_CANDIDATE_LEN", "3"))
 MAX_CANDIDATES = int(os.getenv("MAX_CANDIDATES", "40"))
 
+ACTION_VERBS = [
+    "achieved", "acquired", "adapted", "addressed", "administered", "advised", "allocated", "analyzed", "anticipated", "applied",
+    "approved", "arranged", "assessed", "assigned", "assisted", "attained", "audited", "authored", "automated", "balanced",
+    "budgeted", "built", "calculated", "captured", "chaired", "clarified", "classified", "closed", "coached", "collaborated",
+    "collected", "combined", "communicated", "completed", "computed", "conceptualized", "conducted", "consolidated", "constructed", "consulted",
+    "contracted", "contributed", "controlled", "converted", "coordinated", "corresponded", "counseled", "created", "critiqued", "cultivated",
+    "customized", "debugged", "decided", "defined", "delegated", "delivered", "demonstrated", "designed", "detailed", "determined",
+    "developed", "devised", "diagnosed", "directed", "discovered", "displayed", "distributed", "documented", "doubled", "drafted",
+    "edited", "educated", "effected", "elicited", "eliminated", "emphasized", "enabled", "enacted", "encouraged", "endured",
+    "enforced", "engineered", "enhanced", "enlarged", "enlisted", "ensured", "entered", "established", "estimated", "evaluated",
+    "examined", "exceeded", "executed", "exercised", "expanded", "expedited", "experimented", "explained", "explored", "expressed",
+    "extended", "extracted", "fabricated", "facilitated", "familiarized", "fashioned", "filed", "finalized", "financed", "fitted",
+    "focused", "forecasted", "formulated", "fostered", "found", "founded", "framed", "fulfilled", "functioned", "furnished",
+    "gained", "gathered", "generated", "governed", "graduated", "granted", "grouped", "guided", "handled", "helped",
+    "identified", "illuminated", "illustrated", "implemented", "improved", "improvised", "inaugurated", "indoctrinated", "increased", "indexed",
+    "indicated", "individualized", "influenced", "informed", "initiated", "innovated", "inspected", "inspired", "installed", "instigated",
+    "instilled", "instituted", "instructed", "insured", "integrated", "interacted", "interpreted", "intervened", "interviewed", "introduced",
+    "invented", "inventoried", "investigated", "involved", "isolated", "issued", "joined", "judged", "justified", "kept",
+    "launched", "learned", "lectured", "led", "licensed", "listened", "located", "logged", "maintained", "managed",
+    "manipulated", "manufactured", "mapped", "marketed", "mastered", "maximized", "measured", "mediated", "mentored", "merged",
+    "met", "minimized", "modeled", "moderated", "modernized", "modified", "monitored", "motivated", "moved", "multiplied",
+    "navigated", "negotiated", "noted", "notified", "observed", "obtained", "offered", "offset", "opened", "operated",
+    "orchestrated", "ordered", "organized", "oriented", "originated", "outlined", "overcame", "overhauled", "oversaw", "participated",
+    "perceived", "performed", "persuaded", "photographed", "piloted", "planned", "played", "predicted", "prepared", "prescribed",
+    "presented", "presided", "prevented", "printed", "prioritized", "processed", "produced", "programmed", "projected", "promoted",
+    "proofread", "proposed", "protected", "proved", "provided", "publicized", "published", "purchased", "qualified", "quantified",
+    "queried", "questioned", "raised", "ran", "rated", "reached", "read", "realigned", "reasoned", "received",
+    "recognized", "recommended", "reconciled", "recorded", "recruited", "rectified", "redesigned", "reduced", "referred", "refined",
+    "refocused", "regulated", "rehabilitated", "reinforced", "reiterated", "rejected", "related", "released", "relied", "remanufactured",
+    "remodeled", "rendered", "renewed", "renovated", "reorganized", "repaired", "replaced", "replied", "reported", "represented",
+    "researched", "resolved", "responded", "restored", "restructured", "retrieved", "revamped", "revealed", "reviewed", "revised",
+    "revitalized", "rewarded", "routed", "saved", "scheduled", "screened", "scrutinized", "searched", "secured", "selected",
+    "served", "serviced", "settled", "shaped", "shared", "showed", "simplified", "simulated", "sketched", "sold",
+    "solved", "sorted", "spearheaded", "specialized", "specified", "spoke", "sponsored", "staffed", "standardized", "started",
+    "stimulated", "strategized", "streamlined", "strengthened", "stressed", "stretched", "structured", "studied", "submitted", "substituted",
+    "succeeded", "suggested", "summarized", "supervised", "supplied", "supported", "surpassed", "surveyed", "synchronized", "synthesized",
+    "systematized", "tabulated", "tailored", "targeted", "taught", "teamed", "tested", "testified", "tightened", "took",
+    "totaled", "traced", "tracked", "traded", "trained", "transcribed", "transferred", "transformed", "translated", "transmitted",
+    "transported", "traveled", "treated", "triggered", "trimmed", "tripled", "troubleshot", "turned", "tutored", "typed",
+    "umpired", "uncovered", "understood", "understudied", "undertook", "underwrote", "unified", "united", "unraveled", "updated",
+    "upgraded", "upheld", "used", "utilized", "validated", "valued", "verified", "viewed", "visited", "visualized",
+    "voiced", "volunteered", "waited", "walked", "wanted", "warned", "washed", "watched", "weighted", "welcomed",
+    "won", "worked", "wrote"
+]
 
 @lru_cache(maxsize=1)
 def load_skills_list() -> List[str]:
@@ -56,18 +100,7 @@ def load_skills_list() -> List[str]:
                     skills.append(skill)
     except Exception:
         # Fallback to a minimal set if file missing
-        skills = [
-            "Python",
-            "JavaScript",
-            "React",
-            "TypeScript",
-            "HTML",
-            "CSS",
-            "Flask",
-            "Django",
-            "SQL",
-            "REST API",
-        ]
+        skills = ["Python", "JavaScript", "React", "TypeScript", "HTML", "CSS", "Flask", "Django", "SQL", "REST API"]
     return skills
 
 
@@ -77,7 +110,6 @@ def load_skill_embeddings() -> Dict[str, List[float]]:
     skills = load_skills_list()
     model = get_model()
     embeddings = model.encode(skills, convert_to_tensor=True)
-    # Map skill -> embedding tensor (retain device tensor for cosine sim)
     return {skill: embeddings[i] for i, skill in enumerate(skills)}
 
 
@@ -94,34 +126,23 @@ def cleanup_phrase(text: str) -> str:
 
 
 def extract_candidates_spacy(text: str) -> List[str]:
-    """
-    Extracts noun chunks and significant nouns from text using spaCy.
-    These are used as 'dynamic' skill candidates from the job description.
-    """
+    """Extracts noun chunks and significant nouns from text using spaCy."""
     nlp = get_nlp()
-    if not text:
-        return []
+    if not text: return []
     try:
         doc = nlp(text)
-    except Exception:
-        return []
+    except Exception: return []
 
     candidates: List[str] = []
-    # Noun chunks
     for chunk in doc.noun_chunks:
         phrase = cleanup_phrase(chunk.text)
-        if len(phrase) >= MIN_CANDIDATE_LEN:
-            candidates.append(phrase)
-    # Significant tokens (PROPN/NOUN) not entirely stop words
+        if len(phrase) >= MIN_CANDIDATE_LEN: candidates.append(phrase)
     for tok in doc:
-        if tok.is_stop or tok.is_punct or tok.like_num:
-            continue
+        if tok.is_stop or tok.is_punct or tok.like_num: continue
         if tok.pos_ in ("PROPN", "NOUN"):
             phrase = cleanup_phrase(tok.text)
-            if len(phrase) >= MIN_CANDIDATE_LEN:
-                candidates.append(phrase)
+            if len(phrase) >= MIN_CANDIDATE_LEN: candidates.append(phrase)
 
-    # Deduplicate while preserving order, case-insensitive uniqueness
     seen_lower = set()
     unique: List[str] = []
     for c in candidates:
@@ -129,15 +150,11 @@ def extract_candidates_spacy(text: str) -> List[str]:
         if cl not in seen_lower:
             seen_lower.add(cl)
             unique.append(c)
-    # Trim
     return unique[:MAX_CANDIDATES]
 
 
 def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[str]:
-    """
-    Identifies canonical skills in text using either exact substring matches
-    or high cosine similarity between embeddings.
-    """
+    """Identifies canonical skills in text using either exact substring matches or semantic similarity."""
     text_lower = (text or "").lower()
     skill_embs = load_skill_embeddings()
     detected: List[str] = []
@@ -147,11 +164,9 @@ def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[
             continue
         try:
             sim = util.cos_sim(emb, text_embedding).item()
-            if sim >= threshold:
-                detected.append(skill)
-        except Exception:
-            continue
-    # Deduplicate preserving order
+            if sim >= threshold: detected.append(skill)
+        except Exception: continue
+    
     seen = set()
     unique: List[str] = []
     for s in detected:
@@ -161,144 +176,97 @@ def detect_skills_semantic(text: str, text_embedding, threshold: float) -> List[
     return unique
 
 
-def presence_by_similarity(
-    phrases: List[str], target_embedding, threshold: float
-) -> List[str]:
-    """
-    Determines if a list of phrases is semantically present in a target document 
-    by comparing their embeddings.
-    """
-    if not phrases:
-        return []
+def presence_by_similarity(phrases: List[str], target_embedding, threshold: float) -> List[str]:
+    """Determines if a list of phrases is semantically present in a target document."""
+    if not phrases: return []
     try:
         model = get_model()
         phrase_embeddings = model.encode(phrases, convert_to_tensor=True)
         sims = util.cos_sim(phrase_embeddings, target_embedding).cpu().numpy().flatten()
         present = [p for p, s in zip(phrases, sims) if s >= threshold]
         return present
-    except Exception:
-        return []
+    except Exception: return []
 
 
 def calculate_match_score(resume_text, job_description):
-    """
-    Core logic: Calculates a percentage match score between a resume and JD,
-    extracts matched/missing skills, and generates tailored suggestions.
-    """
+    """Calculates a percentage match score with detailed sub-score breakdown."""
     try:
         resume_text = normalize(resume_text)
         job_description = normalize(job_description)
         
-        print(f"DEBUG: Resume text length: {len(resume_text)}")
-        print(f"DEBUG: JD text length: {len(job_description)}")
+        if not resume_text: return {"match_score": 0, "extracted_skills": [], "missing_skills": [], "suggestions": "Empty resume."}
 
-        if not resume_text:
-            print("WARNING: Resume text is empty!")
-        
-        # Load model only when needed
         model = get_model()
-        
-        # Embedding-based similarity (document-level)
         resume_embedding = model.encode(resume_text, convert_to_tensor=True)
         jd_embedding = model.encode(job_description, convert_to_tensor=True)
-        score = util.cos_sim(resume_embedding, jd_embedding).item()
-        match_percentage = round(max(0.0, min(1.0, score)) * 100, 2)
-        print(f"DEBUG: Match Score calculated: {match_percentage}")
 
-        # Canonical skills (semantic)
-        resume_skills_canonical = detect_skills_semantic(
-            resume_text, resume_embedding, SKILL_IN_RESUME_THRESHOLD
-        )
-        jd_skills_canonical = detect_skills_semantic(
-            job_description, jd_embedding, SKILL_IN_JD_THRESHOLD
-        )
-        print(f"DEBUG: Canonical skills found in Resume: {len(resume_skills_canonical)}")
-        print(f"DEBUG: Canonical skills found in JD: {len(jd_skills_canonical)}")
+        # 1. Semantic Match (The "Brain" score)
+        semantic_score = util.cos_sim(resume_embedding, jd_embedding).item()
+        semantic_score = round(max(0.0, min(1.0, semantic_score)) * 100, 2)
 
-        # Dynamic candidates from JD via spaCy
+        # 2. Keyword Match (The "ATS" score)
+        resume_skills_canonical = detect_skills_semantic(resume_text, resume_embedding, SKILL_IN_RESUME_THRESHOLD)
+        jd_skills_canonical = detect_skills_semantic(job_description, jd_embedding, SKILL_IN_JD_THRESHOLD)
         jd_candidates = extract_candidates_spacy(job_description)
-        print(f"DEBUG: spaCy JD candidates extracted: {len(jd_candidates)}")
-        # Consider only meaningful candidates (filter overly generic)
-        generic = {
-            "experience",
-            "skills",
-            "responsibilities",
-            "team",
-            "project",
-            "work",
-            "role",
-            "company",
-            "job",
-            "requirement",
-            "requirements",
-        }
+        
+        # Filter generic keywords
+        generic = {"experience", "skills", "responsibilities", "team", "project", "work", "role", "company", "job", "requirement", "requirements"}
         jd_candidates = [c for c in jd_candidates if c.lower() not in generic]
 
-        # Determine which JD candidates appear in the resume semantically
-        present_dynamic = presence_by_similarity(
-            jd_candidates, resume_embedding, CANDIDATE_SIM_THRESHOLD
-        )
-        missing_dynamic = [c for c in jd_candidates if c not in present_dynamic]
-
-        # Extract resume dynamic candidates as those JD candidates that are present
-        resume_skills_dynamic = present_dynamic
-
-        # Merge canonical and dynamic
-        def merge_unique(a: List[str], b: List[str]) -> List[str]:
+        present_dynamic = presence_by_similarity(jd_candidates, resume_embedding, CANDIDATE_SIM_THRESHOLD)
+        
+        # Merge skills
+        def merge(a, b):
             seen = set()
-            merged: List[str] = []
-            for lst in (a, b):
-                for item in lst:
-                    key = item.strip()
-                    if key and key not in seen:
-                        seen.add(key)
-                        merged.append(item)
-            return merged
+            return [x for x in a + b if x.strip() and not (x.strip() in seen or seen.add(x.strip()))]
 
-        extracted_skills = merge_unique(resume_skills_canonical, resume_skills_dynamic)
-        # Missing: prioritize JD canonical + JD dynamic not present in extracted
-        missing_skills = [
-            s
-            for s in merge_unique(jd_skills_canonical, jd_candidates)
-            if s not in set(extracted_skills)
-        ]
+        extracted_skills = merge(resume_skills_canonical, present_dynamic)
+        all_required = merge(jd_skills_canonical, jd_candidates)
+        missing_skills = [s for s in all_required if s not in set(extracted_skills)]
 
-        # Suggestions (rule-based)
+        keyword_score = round((len(extracted_skills) / max(len(all_required), 1)) * 100, 2)
+
+        # 3. Action Verbs (The "Impact" score)
+        found_verbs = [v for v in ACTION_VERBS if f" {v} " in f" {resume_text.lower()} "]
+        action_score = round(min(len(found_verbs) / 15.0, 1.0) * 100, 2)
+
+        # 4. Formatting Score (The "Professionalism" score)
+        formatting_score = 100
+        if len(resume_text) < 500: formatting_score -= 30  # Too short
+        if not re.search(r'[\w\.-]+@[\w\.-]+', resume_text): formatting_score -= 20  # No email
+        if not re.search(r'linkedin\.com', resume_text.lower()): formatting_score -= 10 # No LinkedIn
+
+        # Calculate weighted overall score
+        # Weighting: 40% Semantic, 30% Keywords, 20% Action Verbs, 10% Formatting
+        match_percentage = round(
+            (semantic_score * 0.4) + 
+            (keyword_score * 0.3) + 
+            (action_score * 0.2) + 
+            (formatting_score * 0.1), 
+            2
+        )
+
+        # Generate suggestions
         suggestions_parts = []
-        if missing_skills:
-            suggestions_parts.append(
-                f"Consider highlighting these areas to better match the role: {', '.join(missing_skills[:10])}{'…' if len(missing_skills) > 10 else ''}."
-            )
-        if match_percentage < 60:
-            suggestions_parts.append(
-                "Your match score is below 60%. Tailor your summary and experience bullets to reflect the job requirements more closely."
-            )
-        elif match_percentage < 80:
-            suggestions_parts.append(
-                "Good alignment. You can further improve by aligning terminology and quantifying achievements."
-            )
-        else:
-            suggestions_parts.append(
-                "Strong match. Ensure your most relevant accomplishments are prominent in the top third of your resume."
-            )
-        if (jd_skills_canonical or jd_candidates) and not missing_skills:
-            suggestions_parts.append(
-                "All key areas from the job description are covered. Great!"
-            )
-        suggestions = " ".join(suggestions_parts)
+        if action_score < 60: suggestions_parts.append("Use more strong action verbs (e.g., 'Led', 'Developed', 'Optimized') to describe your achievements.")
+        if keyword_score < 60: suggestions_parts.append(f"Try to incorporate these specific keywords from the JD: {', '.join(missing_skills[:5])}.")
+        if formatting_score < 90: suggestions_parts.append("Ensure your contact information and professional links (LinkedIn) are clearly visible.")
+        
+        suggestions = " ".join(suggestions_parts) if suggestions_parts else "Your resume is well-optimized for this role."
 
         return {
             "match_score": match_percentage,
             "extracted_skills": extracted_skills,
             "missing_skills": missing_skills,
             "suggestions": suggestions,
+            "breakdown": {
+                "Semantic": semantic_score,
+                "Keywords": keyword_score,
+                "Action Verbs": action_score,
+                "Formatting": formatting_score
+            }
         }
 
     except Exception as e:
         print(f"CRITICAL ERROR in calculate_match_score: {e}")
-        return {
-            "match_score": 0,
-            "extracted_skills": [],
-            "missing_skills": [],
-            "suggestions": f"Error generating score: {str(e)}",
-        }
+        return {"match_score": 0, "extracted_skills": [], "missing_skills": [], "suggestions": f"Error: {str(e)}"}

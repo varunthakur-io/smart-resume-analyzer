@@ -26,8 +26,10 @@ const UploadForm = () => {
   const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      if (file.type !== "application/pdf") {
-        setError("Only PDF files are supported.");
+      const validTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
+      
+      if (!validTypes.includes(file.type) && !file.name.endsWith(".docx") && !file.name.endsWith(".txt")) {
+        setError("Only PDF, DOCX, and TXT files are supported.");
         return;
       }
       if (file.size > MAX_FILE_MB * 1024 * 1024) {
@@ -59,8 +61,10 @@ const UploadForm = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      if (file.type !== "application/pdf") {
-        setError("Only PDF files are supported.");
+      const validTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
+      
+      if (!validTypes.includes(file.type) && !file.name.endsWith(".docx") && !file.name.endsWith(".txt")) {
+        setError("Only PDF, DOCX, and TXT files are supported.");
         return;
       }
       if (file.size > MAX_FILE_MB * 1024 * 1024) {
@@ -73,7 +77,7 @@ const UploadForm = () => {
     }
   }, []);
 
-  // Main form submission handler: uploads file and JD to backend
+  // Main form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -85,12 +89,10 @@ const UploadForm = () => {
     setLoading(true);
 
     try {
-      // POST request to backend analysis endpoint
       const res = await axios.post(`${API_BASE}/analyze`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Structure data for UI consumption and navigation
       const enriched = {
         id: res.data.id || String(Date.now()),
         resume_name: resume?.name || res.data.resume_name || "Uploaded Resume",
@@ -99,9 +101,9 @@ const UploadForm = () => {
         missing_skills: res.data.missing_skills || [],
         suggestions: res.data.suggestions || "",
         resume_file: res.data.resume_file || null,
+        breakdown: res.data.breakdown || {}
       };
 
-      // Redirect to detailed analysis page with data in route state
       navigate("/analysis", { state: { analysis: enriched } });
     } catch (err) {
       console.error(err);
@@ -128,7 +130,7 @@ const UploadForm = () => {
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-8 flex flex-col">
         <div className="mb-6">
           <h3 className="text-xl font-black text-slate-900 dark:text-white">1. Upload Resume</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">PDF format required (max 10MB)</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">PDF, DOCX, or TXT (max 10MB)</p>
         </div>
 
         <div
@@ -167,13 +169,13 @@ const UploadForm = () => {
                 </svg>
               </div>
               <p className="text-slate-600 dark:text-slate-300 font-bold mb-1">Click to browse or drag & drop</p>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Supports PDF only</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Supports PDF, DOCX, TXT</p>
             </>
           )}
           <input
             ref={fileInputRef}
             type="file"
-            accept="application/pdf"
+            accept=".pdf,.docx,.txt"
             onChange={handleResumeChange}
             className="hidden"
           />

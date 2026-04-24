@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from config import ANALYSES_DIR, UPLOADS_DIR
-from utils.extractor import extract_text_from_pdf
+from utils.extractor import extract_text
 from utils.matcher import calculate_match_score
 
 
@@ -35,7 +35,8 @@ class AnalysisService:
         file_path = self.uploads_dir / safe_filename
         resume_file.save(str(file_path))
 
-        resume_text = extract_text_from_pdf(str(file_path))
+        # Use the generic extract_text function to support PDF, DOCX, TXT
+        resume_text = extract_text(str(file_path))
         match_result = calculate_match_score(resume_text, job_description)
 
         doc = {
@@ -46,6 +47,7 @@ class AnalysisService:
             "extracted_skills": match_result.get("extracted_skills", []),
             "missing_skills": match_result.get("missing_skills", []),
             "suggestions": match_result.get("suggestions", ""),
+            "breakdown": match_result.get("breakdown", {})
         }
         self._save_doc(doc)
 

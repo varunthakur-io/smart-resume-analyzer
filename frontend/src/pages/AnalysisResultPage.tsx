@@ -13,6 +13,7 @@ interface Analysis {
   missing_skills?: string[];
   suggestions?: string;
   resume_file?: string | null;
+  breakdown?: Record<string, number>;
 }
 
 const AnalysisResultPage: React.FC = () => {
@@ -40,7 +41,6 @@ const AnalysisResultPage: React.FC = () => {
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // Safely extract analysis data from router state
   const analysis = useMemo(() => {
     const state = location.state as any;
     return state?.analysis as Analysis | undefined;
